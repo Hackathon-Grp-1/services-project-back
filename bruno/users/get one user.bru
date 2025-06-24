@@ -1,0 +1,19 @@
+meta {
+  name: get one user
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{base_url}}/users/{{id}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+vars:pre-request {
+  id: 1
+}

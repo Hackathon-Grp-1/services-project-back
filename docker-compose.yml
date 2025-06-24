@@ -1,0 +1,35 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: services_api
+    command: npm run start:dev
+    ports:
+      - '${PORT:-3007}:${PORT:-3007}'
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - db
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=dev
+
+  db:
+    image: postgres:16
+    container_name: services_postgres
+    ports:
+      - '${POSTGRES_PORT:-5433}:5432'
+    volumes:
+      - services_pg_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_NAME}
+
+volumes:
+  services_pg_data:

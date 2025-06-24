@@ -1,0 +1,25 @@
+name: Push verifications
+on:
+  - push
+jobs:
+  check:
+    runs-on: ubuntu-22.04
+    env:
+      IMAGE_NAME: 'services-api'
+    steps:
+      - name: Checkout on branch
+        uses: actions/checkout@v4
+
+      - name: Lint Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: ./dockerfile
+
+      - name: Build project image
+        run: docker image build --tag="${IMAGE_NAME}" ./
+
+      - name: Lint, build and run test
+        run: |
+          docker container run "${IMAGE_NAME}" npm run lint
+          docker container run "${IMAGE_NAME}" npm run build
+          docker container run "${IMAGE_NAME}" npm run test

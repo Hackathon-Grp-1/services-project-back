@@ -1,0 +1,14 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "vivaxy.vscode-conventional-commits",
+    "vscode-icons-team.vscode-icons",
+    "SonarSource.sonarlint-vscode",
+    "streetsidesoftware.code-spell-checker",
+    "streetsidesoftware.code-spell-checker-french",
+    "esbenp.prettier-vscode",
+    "eamodio.gitlens",
+    "aaron-bond.better-comments",
+    "usernamehw.errorlens"
+  ]
+}

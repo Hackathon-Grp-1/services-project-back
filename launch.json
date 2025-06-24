@@ -1,0 +1,28 @@
+{
+  "version": "0.1.0",
+  "configurations": [
+    {
+      "name": "Run Dev",
+      "type": "node",
+      "restart": true,
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start:dev"],
+      "console": "internalConsole",
+      "outputCapture": "std"
+    },
+    {
+      "name": "Run Debug",
+      "type": "node",
+      "restart": true,
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start:debug"],
+      "console": "internalConsole",
+      "outputCapture": "std"
+    }
+  ],
+  "inputs": []
+}

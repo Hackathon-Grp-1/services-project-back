@@ -1,0 +1,26 @@
+meta {
+  name: register
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/auth/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "firstName": "Olivier",
+      "lastName": "PERDRIX",
+      "companyName": "octopus",
+      "email": "olivierperdrix@live.fr",
+      "phoneNumber": "+33 6 03 48 78 56",
+      "password": "Password!",
+      "confirmPassword": "Password!",
+      "siretNumber": "10000000000014",
+      "planType": "ADMIN_MANAGE",
+      "comment": ""
+  }
+}

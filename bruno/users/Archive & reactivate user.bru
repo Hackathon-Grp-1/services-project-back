@@ -1,0 +1,19 @@
+meta {
+  name: Archive & reactivate user
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{base_url}}/users/{{id}}/update-state
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+vars:pre-request {
+  id: 1
+}

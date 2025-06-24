@@ -1,0 +1,31 @@
+meta {
+  name: create user
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/users
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john@doe.com",
+    "password": "Azerty@1",
+    "confirmPassword": "Azerty@1",
+    "role": "VISITOR"
+  }
+}
+
+body:multipart-form {
+  name: John Doe
+  role: READ_ONLY
+}
