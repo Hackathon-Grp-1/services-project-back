@@ -31,6 +31,15 @@ const configuration = () => ({
     duration: parseInt(process.env.JWT_DURATION ?? '3600'),
     secret: process.env.JWT_SECRET ?? '',
   },
+
+  mail: {
+    host: process.env.MAIL_HOST ?? 'smtp.example.com',
+    port: parseInt(process.env.MAIL_PORT ?? '587', 10),
+    user: process.env.MAIL_USER ?? '',
+    pass: process.env.MAIL_PASS ?? '',
+    from: process.env.MAIL_FROM ?? 'noreply@example.com',
+    secure: process.env.MAIL_SECURE === 'true',
+  },
 });
 
 export default configuration;

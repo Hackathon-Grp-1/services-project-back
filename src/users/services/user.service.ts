@@ -2,6 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityFilteredListResults, getEntityFilteredList } from '@paginator/paginator.service';
 import { Password } from '@src/auth/helpers/password.utils';
+import { MailerService } from '@src/common/services/mailer.service';
+import { ApiConfigService } from '@src/config/services/api-config.service';
+import { randomBytes } from 'crypto';
 import { In, Repository } from 'typeorm';
 import { CreateUserDto, FormattedCreatedUserDto } from '../dto/user/create-user.dto';
 import { UpdateUserDto } from '../dto/user/update-user.dto';
@@ -17,6 +20,8 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
+    private readonly mailerService: MailerService,
+    private readonly configService: ApiConfigService,
   ) {}
 
   /**
@@ -166,5 +171,44 @@ export class UserService {
    */
   async restoreUser(id: number): Promise<void> {
     await this.userRepository.restore(id);
+  }
+
+  /**
+   * Démarre la procédure de reset password : génère un token, construit un lien et envoie le mail.
+   */
+  async requestPasswordReset(email: string): Promise<void> {
+    const user = await this.userRepository.findOneBy({ email });
+    if (!user) return; // Ne pas révéler si l'email existe
+
+    // Générer un token temporaire (à stocker en BDD ou cache dans une vraie app)
+    const token = randomBytes(32).toString('hex');
+    // Stocker le token et sa date d'expiration pour l'utilisateur
+    user.resetPasswordToken = token;
+    user.resetPasswordTokenExpires = new Date(Date.now() + 60 * 60 * 1000); // 1h
+    await this.userRepository.save(user);
+
+    // Construire le lien de reset
+    const resetLink = `${this.configService.get('app_url')}/reset-password/confirm?token=${token}`;
+
+    // Envoyer le mail
+    await this.mailerService.sendMail({
+      to: user.email,
+      subject: 'Password Reset Request',
+      html: `<p>To reset your password, click <a href="${resetLink}">here</a>. This link is valid for 1 hour.</p>`,
+    });
+  }
+
+  /**
+   * Confirme la réinitialisation du mot de passe avec le token et le nouveau mot de passe.
+   */
+  async confirmResetPassword(token: string, newPassword: string): Promise<void> {
+    const user = await this.userRepository.findOneBy({ resetPasswordToken: token });
+    if (!user || !user.resetPasswordTokenExpires || user.resetPasswordTokenExpires < new Date()) {
+      throw new Error('Invalid or expired token');
+    }
+    user.password = Password.hash(newPassword);
+    user.resetPasswordToken = null;
+    user.resetPasswordTokenExpires = null;
+    await this.userRepository.save(user);
   }
 }

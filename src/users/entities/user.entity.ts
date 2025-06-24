@@ -38,4 +38,11 @@ export class User extends SoftDeleteEntity {
   @ApiProperty({ nullable: true, type: () => Service })
   @OneToMany(() => Service, (service) => service.user)
   services: Relation<Service[]>;
+  @ApiProperty({ description: 'Token temporaire pour la réinitialisation du mot de passe', nullable: true })
+  @Column({ type: 'varchar', nullable: true })
+  resetPasswordToken?: string | null;
+
+  @ApiProperty({ description: 'Expiration du token de réinitialisation', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
+  resetPasswordTokenExpires?: Date | null;
 }

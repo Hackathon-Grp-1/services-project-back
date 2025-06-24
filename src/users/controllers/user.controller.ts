@@ -1,6 +1,7 @@
 import { Body, Controller, Get, HttpStatus, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ActivityLogger } from '@src/activity-logger/helpers/activity-logger.decorator';
+import { DisableActivityLogger } from '@src/activity-logger/helpers/disable-logger.decorator';
 import { Resources } from '@src/activity-logger/types/resource.types';
 import { Roles } from '@src/auth/decorators/role.decorator';
 import { GetUser } from '@src/auth/decorators/user.decorator';
@@ -8,9 +9,11 @@ import { JwtAuthGuard } from '@src/auth/guards/jwt.guard';
 import { RolesGuard } from '@src/auth/guards/role.guard';
 import { AuthForbiddenException } from '@src/auth/helpers/auth.exception';
 import { LoggedUser } from '@src/auth/types/logged-user.type';
+import { Public } from '@src/common/decorators/public.decorator';
 import { SwaggerFailureResponse } from '@src/common/helpers/common-set-decorators.helper';
 import { PaginatedList } from '@src/paginator/paginator.type';
 import { CreateUserDto, FormattedCreatedUserDto } from '../dto/user/create-user.dto';
+import { ResetPasswordDto, ResetPasswordRequestDto } from '../dto/user/reset-password.dto';
 import { UpdateUserDto } from '../dto/user/update-user.dto';
 import { UserQueryFilterDto } from '../dto/user/user-query-filter.dto';
 import { User } from '../entities/user.entity';
@@ -147,5 +150,30 @@ export class UserController {
       await this.userService.archiveUser(id);
       return { message: 'User archived', id };
     }
+  }
+
+  /**
+   * Démarre la procédure de réinitialisation du mot de passe pour un utilisateur.
+   *
+   * @param {ResetPasswordRequestDto} dto - L'email de l'utilisateur.
+   * @returns {Promise<{ message: string }>} Un message de confirmation.
+   */
+  @Public()
+  @DisableActivityLogger()
+  @Post('reset-password')
+  async requestPasswordReset(@Body() dto: ResetPasswordRequestDto): Promise<{ message: string }> {
+    await this.userService.requestPasswordReset(dto.email);
+    return { message: 'If this email exists, a reset link has been sent.' };
+  }
+
+  /**
+   * Confirme la réinitialisation du mot de passe avec le token et le nouveau mot de passe.
+   */
+  @Public()
+  @DisableActivityLogger()
+  @Post('reset-password/confirm')
+  async confirmResetPassword(@Body() dto: ResetPasswordDto): Promise<{ message: string }> {
+    await this.userService.confirmResetPassword(dto.token, dto.newPassword);
+    return { message: 'Password has been reset successfully.' };
   }
 }
