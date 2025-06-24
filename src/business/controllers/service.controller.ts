@@ -1,10 +1,10 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
-import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GetUser } from '@src/auth/decorators/user.decorator';
 import { LoggedUser } from '@src/auth/types/logged-user.type';
 import { CreateServiceDto } from '../dto/create-service.dto';
 import { UpdateServiceDto } from '../dto/update-service.dto';
-import { Service, ServiceType } from '../entities/service.entity';
+import { Service } from '../entities/service.entity';
 import { ServiceService } from '../services/service.service';
 
 @ApiTags('services')
@@ -33,17 +33,12 @@ export class ServiceController {
   }
 
   @Get('type/:type')
-  @ApiQuery({
-    name: 'type',
-    enum: ServiceType,
-    description: 'Type de service à filtrer'
-  })
   @ApiResponse({
     status: 200,
     type: [Service],
     description: 'Récupérer tous les services d\'un type spécifique'
   })
-  async findByType(@Param('type') type: ServiceType): Promise<Service[]> {
+  async findByType(@Param('type') type: 'human_provider' | 'ai_agent'): Promise<Service[]> {
     return this.serviceService.findByType(type);
   }
 

@@ -1,4 +1,7 @@
-import { ServiceType } from '../entities/service.entity';
+export enum ServiceType {
+  HUMAN_PROVIDER = 'human_provider',
+  AI_AGENT = 'ai_agent',
+}
 
 export interface BaseServiceData {
   serviceType: ServiceType;

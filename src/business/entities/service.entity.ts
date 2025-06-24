@@ -1,24 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { SoftDeleteEntity } from '../../common/entities/soft-delete.entity';
-import { User } from '../../users/entities/user.entity';
 import { Organization } from './organization.entity';
-
-export enum ServiceType {
-  HUMAN_PROVIDER = 'human_provider',
-  AI_AGENT = 'ai_agent',
-}
 
 @Entity('services')
 export class Service extends SoftDeleteEntity {
-  @ApiProperty({ enum: ServiceType, description: 'Type de service: prestataire humain ou agent IA' })
+  @ApiProperty({ type: String, description: 'Type de service: "human_provider" ou "ai_agent"' })
   @Column({
     name: 'service_type',
     type: 'enum',
-    enum: ServiceType,
-    default: ServiceType.HUMAN_PROVIDER
+    enum: ['human_provider', 'ai_agent'],
+    default: 'human_provider'
   })
-  serviceType: ServiceType;
+  serviceType: 'human_provider' | 'ai_agent';
 
   @ApiProperty({ required: false, description: 'Prénom (pour les prestataires humains)' })
   @Column({ name: 'first_name', type: 'varchar', length: 64, nullable: true })
@@ -76,7 +70,10 @@ export class Service extends SoftDeleteEntity {
   @Column({ name: 'ai_version', type: 'varchar', length: 32, nullable: true })
   aiVersion?: string;
 
-  @ApiProperty({ type: () => User })
-  @ManyToOne(() => User, { nullable: false })
-  user: User;
+  @ApiProperty({ description: 'ID de l\'utilisateur propriétaire' })
+  @Column({ name: 'user_id', type: 'int' })
+  userId: number;
+
+  @ManyToOne('User', 'services', { nullable: false })
+  user: any;
 }

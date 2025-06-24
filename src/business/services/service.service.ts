@@ -6,7 +6,7 @@ import { UserService } from '../../users/services/user.service';
 import { CreateServiceDto } from '../dto/create-service.dto';
 import { UpdateServiceDto } from '../dto/update-service.dto';
 import { Organization } from '../entities/organization.entity';
-import { Service, ServiceType } from '../entities/service.entity';
+import { Service } from '../entities/service.entity';
 import { OrganizationNotFoundException } from '../exceptions/organization.exception';
 
 @Injectable()
@@ -37,7 +37,7 @@ export class ServiceService {
 
     const service = this.serviceRepository.create({
       ...rest,
-      user: userEntity,
+      userId: user,
       organization: orgEntity,
     });
     return this.serviceRepository.save(service);
@@ -57,11 +57,11 @@ export class ServiceService {
     const { user, organization, ...rest } = updateServiceDto;
 
     // Check user if provided
-    let userEntity = service.user;
+    let userId = service.userId;
     if (user) {
       const foundUser = await this.userService.findOneById(user);
       if (!foundUser) throw new UserNotFoundException({ id: user });
-      userEntity = foundUser;
+      userId = user;
     }
 
     // Check organization if provided
@@ -78,7 +78,7 @@ export class ServiceService {
 
     Object.assign(service, {
       ...rest,
-      user: userEntity,
+      userId,
       organization: orgEntity,
     });
 
@@ -87,15 +87,15 @@ export class ServiceService {
 
   async findAllByUser(userId: number): Promise<Service[]> {
     return this.serviceRepository.find({
-      where: { user: { id: userId } },
-      relations: ['user', 'organization']
+      where: { userId },
+      relations: ['organization']
     });
   }
 
   async findOne(id: number): Promise<Service> {
     const service = await this.serviceRepository.findOne({
       where: { id },
-      relations: ['user', 'organization']
+      relations: ['organization']
     });
     if (!service) {
       throw new BadRequestException(`Service with ID ${id} not found`);
@@ -103,15 +103,15 @@ export class ServiceService {
     return service;
   }
 
-  async findByType(type: ServiceType): Promise<Service[]> {
+  async findByType(type: 'human_provider' | 'ai_agent'): Promise<Service[]> {
     return this.serviceRepository.find({
       where: { serviceType: type },
-      relations: ['user', 'organization']
+      relations: ['organization']
     });
   }
 
   private validateServiceData(data: any): void {
-    if (data.serviceType === ServiceType.HUMAN_PROVIDER) {
+    if (data.serviceType === 'human_provider') {
       if (!data.firstName) {
         throw new BadRequestException('firstName is required for human providers');
       }
@@ -121,7 +121,7 @@ export class ServiceService {
       if (!data.phone) {
         throw new BadRequestException('phone is required for human providers');
       }
-    } else if (data.serviceType === ServiceType.AI_AGENT) {
+    } else if (data.serviceType === 'ai_agent') {
       if (!data.aiAgentName) {
         throw new BadRequestException('aiAgentName is required for AI agents');
       }

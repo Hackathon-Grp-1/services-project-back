@@ -1,13 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { ArrayNotEmpty, IsArray, IsEnum, IsInt, IsNumber, IsOptional, IsPositive, IsString, ValidateIf } from 'class-validator';
-import { ServiceType } from '../entities/service.entity';
 
 export class UpdateServiceDto {
-  @ApiProperty({ required: false, enum: ServiceType, description: 'Type de service: prestataire humain ou agent IA' })
+  @ApiProperty({ type: String, required: false, description: 'Type de service: "human_provider" ou "ai_agent"' })
   @IsOptional()
-  @IsEnum(ServiceType)
-  serviceType?: ServiceType;
+  @IsEnum(['human_provider', 'ai_agent'])
+  serviceType?: 'human_provider' | 'ai_agent';
 
   @ApiProperty({ required: false, type: 'number' })
   @IsOptional()
@@ -17,19 +16,19 @@ export class UpdateServiceDto {
   user?: number;
 
   @ApiProperty({ required: false, description: 'Prénom (requis pour les prestataires humains)' })
-  @ValidateIf(o => o.serviceType === ServiceType.HUMAN_PROVIDER)
+  @ValidateIf(o => o.serviceType === 'human_provider')
   @IsOptional()
   @IsString()
   firstName?: string;
 
   @ApiProperty({ required: false, description: 'Nom de famille (requis pour les prestataires humains)' })
-  @ValidateIf(o => o.serviceType === ServiceType.HUMAN_PROVIDER)
+  @ValidateIf(o => o.serviceType === 'human_provider')
   @IsOptional()
   @IsString()
   lastName?: string;
 
   @ApiProperty({ required: false, description: 'Nom de l\'agent IA (requis pour les agents IA)' })
-  @ValidateIf(o => o.serviceType === ServiceType.AI_AGENT)
+  @ValidateIf(o => o.serviceType === 'ai_agent')
   @IsOptional()
   @IsString()
   aiAgentName?: string;
@@ -41,7 +40,7 @@ export class UpdateServiceDto {
   organization?: number;
 
   @ApiProperty({ required: false, description: 'Téléphone (requis pour les prestataires humains)' })
-  @ValidateIf(o => o.serviceType === ServiceType.HUMAN_PROVIDER)
+  @ValidateIf(o => o.serviceType === 'human_provider')
   @IsOptional()
   @IsString()
   phone?: string;
@@ -84,13 +83,13 @@ export class UpdateServiceDto {
   shortSkillsDescription?: string;
 
   @ApiProperty({ required: false, description: 'Modèle d\'IA utilisé (requis pour les agents IA)' })
-  @ValidateIf(o => o.serviceType === ServiceType.AI_AGENT)
+  @ValidateIf(o => o.serviceType === 'ai_agent')
   @IsOptional()
   @IsString()
   aiModel?: string;
 
   @ApiProperty({ required: false, description: 'Version de l\'agent IA (requis pour les agents IA)' })
-  @ValidateIf(o => o.serviceType === ServiceType.AI_AGENT)
+  @ValidateIf(o => o.serviceType === 'ai_agent')
   @IsOptional()
   @IsString()
   aiVersion?: string;

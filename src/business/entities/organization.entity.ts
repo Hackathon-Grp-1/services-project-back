@@ -1,20 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { SoftDeleteEntity } from '../../common/entities/soft-delete.entity';
-import { User } from '../../users/entities/user.entity';
 import { OrganizationEconomicSizeKind } from '../types/organization.types';
 
 @Entity('organizations')
 export class Organization extends SoftDeleteEntity {
-  @ApiProperty({ type: () => User })
-  @ManyToOne(() => User, { nullable: false })
+  @ApiProperty({ description: 'Auteur de l\'organisation' })
+  @ManyToOne('User', { nullable: false })
   @JoinColumn({ name: 'author_id' })
-  author: User;
+  author: any;
 
-  @ApiProperty({ type: () => User, required: false })
-  @ManyToOne(() => User, { nullable: true })
+  @ApiProperty({ description: 'Propriétaire de l\'organisation', required: false })
+  @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'owner_id' })
-  owner?: User;
+  owner?: any;
 
   @ApiProperty({ required: false })
   @Column({ name: 'legal_name', type: 'varchar', length: 64, nullable: true })
@@ -89,7 +88,7 @@ export class Organization extends SoftDeleteEntity {
   @Column({ name: 'summary', type: 'text', nullable: true })
   summary?: string;
 
-  @ApiProperty({ type: () => Organization, required: false })
+  @ApiProperty({ description: 'Organisation parente', required: false })
   @ManyToOne(() => Organization, { nullable: true })
   @JoinColumn({ name: 'parent_organization_id' })
   parentOrganization?: Organization;
