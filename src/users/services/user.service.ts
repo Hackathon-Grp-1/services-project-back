@@ -90,7 +90,7 @@ export class UserService {
    * @throws {Error} If the user does not exist.
    */
   async findOneById(id: number): Promise<User | null> {
-    return await this.userRepository.findOne({ where: { id }, relations: ['role', 'company'], withDeleted: true });
+    return await this.userRepository.findOne({ where: { id }, relations: ['role'], withDeleted: true });
   }
 
   /**
@@ -113,7 +113,6 @@ export class UserService {
         'user.password',
       ])
       .leftJoinAndSelect('user.role', 'role')
-      .leftJoinAndSelect('user.company', 'company')
       .where('user.email = :email', { email })
       .withDeleted()
       .getOne();

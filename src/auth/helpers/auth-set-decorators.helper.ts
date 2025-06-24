@@ -13,7 +13,7 @@ export const SwaggerAuthSignIn = () => {
 
 export const SwaggerAuthCreateUserRequest = () => {
   return applyDecorators(
-    ApiOperation({ summary: 'Create a new user request with company and plan' }),
+    ApiOperation({ summary: 'Create a new user request' }),
     ApiCreatedResponse({
       description: 'The user request has been successfully created',
       type: FormattedCreatedUserDto,

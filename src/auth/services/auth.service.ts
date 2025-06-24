@@ -30,7 +30,7 @@ export class AuthService {
   }
 
   /**
-   * Creates a new company, plan, and visitor user based on the registration request.
+   * Creates a new user based on the registration request.
    * @param createUserRequestDto The registration request data
    * @returns The created user without sensitive information
    */

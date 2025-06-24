@@ -42,7 +42,7 @@ export class AuthController {
   }
 
   /**
-   * Create a new user request with company and plan.
+   * Create a new user request.
    * @param createUserRequestDto The registration request data
    * @returns The created user without sensitive information
    */

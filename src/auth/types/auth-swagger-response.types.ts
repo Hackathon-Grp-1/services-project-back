@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { RoleType } from '@src/users/types/role.types';
 
 export class SwaggerLoggedUser {
   @ApiProperty({ example: 1 })
@@ -10,7 +11,7 @@ export class SwaggerLoggedUser {
   @ApiProperty({ example: 'John Doe' })
   name: string;
 
-  @ApiProperty({ example: 'COMPANY' })
+  @ApiProperty({ enum: RoleType, example: RoleType.ENTREPRENEUR })
   role: string;
 }
 
