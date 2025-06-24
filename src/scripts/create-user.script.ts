@@ -49,7 +49,7 @@ const createUser = async () => {
         },
         {
           name: 'Business man',
-          value: RoleType.BUSINESS_MAN,
+          value: RoleType.ENTREPRENEUR,
         },
         {
           name: 'Customer',
