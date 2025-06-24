@@ -1,11 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserNotFoundException } from '../../users/helpers/exceptions/user.exception';
 import { UserService } from '../../users/services/user.service';
 import { CreateServiceDto } from '../dto/create-service.dto';
+import { UpdateServiceDto } from '../dto/update-service.dto';
 import { Organization } from '../entities/organization.entity';
-import { Service } from '../entities/service.entity';
+import { Service, ServiceType } from '../entities/service.entity';
 import { OrganizationNotFoundException } from '../exceptions/organization.exception';
 
 @Injectable()
@@ -14,13 +15,18 @@ export class ServiceService {
     @InjectRepository(Service)
     private readonly serviceRepository: Repository<Service>,
     private readonly userService: UserService,
-  ) {}
+  ) { }
 
   async create(createServiceDto: CreateServiceDto): Promise<Service> {
     const { user, organization, ...rest } = createServiceDto;
+
+    // Validation spécifique au type de service
+    this.validateServiceData(rest);
+
     // Check user
     const userEntity = await this.userService.findOneById(user);
     if (!userEntity) throw new UserNotFoundException({ id: user });
+
     // Check organization if provided
     let orgEntity: Organization | undefined = undefined;
     if (organization) {
@@ -28,6 +34,7 @@ export class ServiceService {
       if (!foundOrg) throw new OrganizationNotFoundException({ id: organization });
       orgEntity = foundOrg;
     }
+
     const service = this.serviceRepository.create({
       ...rest,
       user: userEntity,
@@ -36,7 +43,94 @@ export class ServiceService {
     return this.serviceRepository.save(service);
   }
 
+  async update(id: number, updateServiceDto: UpdateServiceDto): Promise<Service> {
+    const service = await this.serviceRepository.findOne({ where: { id } });
+    if (!service) {
+      throw new BadRequestException(`Service with ID ${id} not found`);
+    }
+
+    // Si le type de service change, valider les nouvelles données
+    if (updateServiceDto.serviceType && updateServiceDto.serviceType !== service.serviceType) {
+      this.validateServiceData({ ...service, ...updateServiceDto });
+    }
+
+    const { user, organization, ...rest } = updateServiceDto;
+
+    // Check user if provided
+    let userEntity = service.user;
+    if (user) {
+      const foundUser = await this.userService.findOneById(user);
+      if (!foundUser) throw new UserNotFoundException({ id: user });
+      userEntity = foundUser;
+    }
+
+    // Check organization if provided
+    let orgEntity = service.organization;
+    if (organization !== undefined) {
+      if (organization) {
+        const foundOrg = await this.serviceRepository.manager.findOne(Organization, { where: { id: organization } });
+        if (!foundOrg) throw new OrganizationNotFoundException({ id: organization });
+        orgEntity = foundOrg;
+      } else {
+        orgEntity = undefined;
+      }
+    }
+
+    Object.assign(service, {
+      ...rest,
+      user: userEntity,
+      organization: orgEntity,
+    });
+
+    return this.serviceRepository.save(service);
+  }
+
   async findAllByUser(userId: number): Promise<Service[]> {
-    return this.serviceRepository.find({ where: { user: { id: userId } }, relations: ['user', 'organization'] });
+    return this.serviceRepository.find({
+      where: { user: { id: userId } },
+      relations: ['user', 'organization']
+    });
+  }
+
+  async findOne(id: number): Promise<Service> {
+    const service = await this.serviceRepository.findOne({
+      where: { id },
+      relations: ['user', 'organization']
+    });
+    if (!service) {
+      throw new BadRequestException(`Service with ID ${id} not found`);
+    }
+    return service;
+  }
+
+  async findByType(type: ServiceType): Promise<Service[]> {
+    return this.serviceRepository.find({
+      where: { serviceType: type },
+      relations: ['user', 'organization']
+    });
+  }
+
+  private validateServiceData(data: any): void {
+    if (data.serviceType === ServiceType.HUMAN_PROVIDER) {
+      if (!data.firstName) {
+        throw new BadRequestException('firstName is required for human providers');
+      }
+      if (!data.lastName) {
+        throw new BadRequestException('lastName is required for human providers');
+      }
+      if (!data.phone) {
+        throw new BadRequestException('phone is required for human providers');
+      }
+    } else if (data.serviceType === ServiceType.AI_AGENT) {
+      if (!data.aiAgentName) {
+        throw new BadRequestException('aiAgentName is required for AI agents');
+      }
+      if (!data.aiModel) {
+        throw new BadRequestException('aiModel is required for AI agents');
+      }
+      if (!data.aiVersion) {
+        throw new BadRequestException('aiVersion is required for AI agents');
+      }
+    }
   }
 }

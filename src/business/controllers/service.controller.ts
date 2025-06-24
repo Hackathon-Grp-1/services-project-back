@@ -1,25 +1,72 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GetUser } from '@src/auth/decorators/user.decorator';
 import { LoggedUser } from '@src/auth/types/logged-user.type';
 import { CreateServiceDto } from '../dto/create-service.dto';
-import { Service } from '../entities/service.entity';
+import { UpdateServiceDto } from '../dto/update-service.dto';
+import { Service, ServiceType } from '../entities/service.entity';
 import { ServiceService } from '../services/service.service';
 
 @ApiTags('services')
 @Controller('services')
 export class ServiceController {
-  constructor(private readonly serviceService: ServiceService) {}
+  constructor(private readonly serviceService: ServiceService) { }
 
   @Post()
-  @ApiResponse({ status: 201, type: Service })
+  @ApiResponse({
+    status: 201,
+    type: Service,
+    description: 'Créer un nouveau service (prestataire humain ou agent IA)'
+  })
   async create(@Body() dto: CreateServiceDto): Promise<Service> {
     return this.serviceService.create(dto);
   }
 
   @Get()
-  @ApiResponse({ status: 200, type: [Service] })
+  @ApiResponse({
+    status: 200,
+    type: [Service],
+    description: 'Récupérer tous les services de l\'utilisateur connecté'
+  })
   async findAllByUser(@GetUser() user: LoggedUser): Promise<Service[]> {
     return this.serviceService.findAllByUser(user.id);
+  }
+
+  @Get('type/:type')
+  @ApiQuery({
+    name: 'type',
+    enum: ServiceType,
+    description: 'Type de service à filtrer'
+  })
+  @ApiResponse({
+    status: 200,
+    type: [Service],
+    description: 'Récupérer tous les services d\'un type spécifique'
+  })
+  async findByType(@Param('type') type: ServiceType): Promise<Service[]> {
+    return this.serviceService.findByType(type);
+  }
+
+  @Get(':id')
+  @ApiResponse({
+    status: 200,
+    type: Service,
+    description: 'Récupérer un service par son ID'
+  })
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Service> {
+    return this.serviceService.findOne(id);
+  }
+
+  @Put(':id')
+  @ApiResponse({
+    status: 200,
+    type: Service,
+    description: 'Mettre à jour un service existant'
+  })
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateServiceDto
+  ): Promise<Service> {
+    return this.serviceService.update(id, dto);
   }
 }
