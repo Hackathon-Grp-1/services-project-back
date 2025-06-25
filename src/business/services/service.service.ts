@@ -89,6 +89,21 @@ export class ServiceService {
     return await this.serviceRepository.find({});
   }
 
+  async findAllIa() {
+    return await this.serviceRepository.find({
+      select: [
+        'firstName',
+        'lastName',
+        'organization',
+        'hourlyRate',
+        'skills',
+        'domain',
+        'shortProfessionalDescription',
+        'shortSkillsDescription',
+      ],
+    });
+  }
+
   async findAllByUser(userId: number): Promise<Service[]> {
     return await this.serviceRepository.find({
       where: { userId },

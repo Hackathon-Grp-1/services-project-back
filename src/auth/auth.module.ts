@@ -6,6 +6,7 @@ import configuration from '@src/config/helpers/api-config.config';
 import { ApiConfigService } from '@src/config/services/api-config.service';
 import { UserModule } from '@src/users/user.module';
 import { AuthController } from './controllers/auth.controller';
+import { ApiKeyStrategy } from './helpers/api-key-strategy';
 import { JwtStrategy } from './helpers/jwt.strategy';
 import { AuthService } from './services/auth.service';
 
@@ -23,6 +24,7 @@ const configService = new ApiConfigService(nestConfigService);
     UserModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, ApiKeyStrategy],
+  exports: [AuthService],
 })
 export class AuthModule {}

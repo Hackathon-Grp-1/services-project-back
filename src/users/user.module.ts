@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ApiKeyStrategy } from '@src/auth/helpers/api-key-strategy';
 import { MailerService } from '@src/common/services/mailer.service';
 import { UserController } from './controllers/user.controller';
 import { Role } from './entities/role.entity';
@@ -10,7 +9,7 @@ import { UserService } from './services/user.service';
 @Module({
   controllers: [UserController],
   imports: [TypeOrmModule.forFeature([User, Role])],
-  providers: [UserService, MailerService, ApiKeyStrategy],
+  providers: [UserService, MailerService],
   exports: [UserService],
 })
 export class UserModule {}
