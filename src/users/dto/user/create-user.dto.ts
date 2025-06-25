@@ -52,7 +52,9 @@ export class FormattedCreatedUserDto extends OmitType(CreateUserDto, [
   'password',
   'confirmPassword',
   'phoneNumber',
+  'email',
 ]) {
   role: Role | null;
   phoneNumber?: string | null;
+  email?: string;
 }

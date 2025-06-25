@@ -12,6 +12,7 @@ import { UserQueryFilterDto } from '../dto/user/user-query-filter.dto';
 import { Role } from '../entities/role.entity';
 import { User } from '../entities/user.entity';
 import { RoleNotFoundException, UserEmailAlreadyExistsException } from '../helpers/exceptions/user.exception';
+import { UserType } from '../types/user.types';
 
 @Injectable()
 export class UserService {
@@ -85,6 +86,10 @@ export class UserService {
       relations: [{ relation: 'role', alias: 'r' }],
     });
     return [users, users.length, totalResults];
+  }
+
+  async findAllApiKey(): Promise<User[]> {
+    return await this.userRepository.find({ where: { type: UserType.API }, withDeleted: true });
   }
 
   /**
@@ -192,7 +197,7 @@ export class UserService {
 
     // Envoyer le mail
     await this.mailerService.sendMail({
-      to: user.email,
+      to: user.email!,
       subject: 'Password Reset Request',
       html: `<p>To reset your password, click <a href="${resetLink}">here</a>. This link is valid for 1 hour.</p>`,
     });

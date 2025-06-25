@@ -10,6 +10,8 @@ export enum AuthErrorCode {
   INVALID_CREDENTIALS = 'INVALID_CREDENTIALS',
   REQUEST_USER_NOT_FOUND = 'REQUEST_USER_NOT_FOUND',
   UNKNOWN_VALIDATE_ERROR = 'UNKNOWN_VALIDATE_ERROR',
+  NO_API_KEY = 'NO_API_KEY',
+  INVALID_API_KEY = 'INVALID_API_KEY',
 }
 
 type ErrorCode = CommonErrorCode | AuthErrorCode;
@@ -31,6 +33,8 @@ export class AuthHttpException extends CustomHttpException {
       [AuthErrorCode.INVALID_CREDENTIALS]: 'User or password invalid',
       [AuthErrorCode.REQUEST_USER_NOT_FOUND]: 'User not found in request',
       [AuthErrorCode.UNKNOWN_VALIDATE_ERROR]: 'Unknown error occurred during validation',
+      [AuthErrorCode.NO_API_KEY]: 'No api key found in headers, key must be named X-API-KEY',
+      [AuthErrorCode.INVALID_API_KEY]: 'Invalid API Key',
     };
 
     return messages[this.code] || null;
@@ -82,5 +86,17 @@ export class UserRequestNotFoundException extends AuthHttpException {
 export class AuthUnknownException extends AuthHttpException {
   constructor() {
     super(AuthErrorCode.UNKNOWN_VALIDATE_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+}
+
+export class InvalidApiKeyException extends AuthHttpException {
+  constructor(details?: Record<string, string | number>) {
+    super(AuthErrorCode.INVALID_API_KEY, HttpStatus.UNAUTHORIZED, details);
+  }
+}
+
+export class AuthNoApiKeyException extends AuthHttpException {
+  constructor() {
+    super(AuthErrorCode.NO_API_KEY, HttpStatus.UNAUTHORIZED);
   }
 }

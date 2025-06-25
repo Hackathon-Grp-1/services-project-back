@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto, FormattedCreatedUserDto } from '@src/users/dto/user/create-user.dto';
+import { UserDeactivateException } from '@src/users/helpers/exceptions/user.exception';
 import { UserService } from '@src/users/services/user.service';
 import { RoleType } from '@src/users/types/role.types';
 import { CreateUserRequestDto } from '../dtos/create-user-request.dto';
-import { InvalidCredentialsException } from '../helpers/auth.exception';
+import { ApiKey } from '../helpers/api-key.utils';
+import { InvalidApiKeyException, InvalidCredentialsException } from '../helpers/auth.exception';
 import { Password } from '../helpers/password.utils';
-import { LoggedUserWithToken } from '../types/logged-user.type';
+import { LoggedUser, LoggedUserWithToken } from '../types/logged-user.type';
 
 @Injectable()
 export class AuthService {
@@ -15,9 +17,9 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async singIn(email: string, password: string): Promise<LoggedUserWithToken> {
+  async singInPassword(email: string, password: string): Promise<LoggedUserWithToken> {
     const user = await this.userService.findOneByEmailWithPassword(email);
-    if (user && Password.compare(password, user.password)) {
+    if (user && user.password && Password.compare(password, user.password)) {
       const payload = { userId: user.id, username: user.email };
       const { password: _, ...returnUser } = user;
       return {
@@ -27,6 +29,23 @@ export class AuthService {
     }
 
     throw new InvalidCredentialsException();
+  }
+
+  async singInApiKey(apiKey: string): Promise<LoggedUser> {
+    const users = await this.userService.findAllApiKey();
+
+    for (const user of users) {
+      if (user.apiKey && ApiKey.compare(apiKey, user.apiKey)) {
+        if (user.deletedAt) {
+          throw new UserDeactivateException({ apiKey });
+        }
+
+        const { apiKey: _, ...partialUser } = user;
+        return partialUser;
+      }
+    }
+
+    throw new InvalidApiKeyException({ apiKey });
   }
 
   /**

@@ -3,6 +3,7 @@ import { ActivityLog } from '@src/activity-logger/entities/activity-logger.entit
 import { Service } from '@src/business/entities/service.entity';
 import { SoftDeleteEntity } from '@src/common/entities/soft-delete.entity';
 import { Column, Entity, ManyToOne, OneToMany, Relation } from 'typeorm';
+import { UserType } from '../types/user.types';
 import { Role } from './role.entity';
 
 @Entity()
@@ -15,13 +16,21 @@ export class User extends SoftDeleteEntity {
   @Column()
   lastName: string;
 
-  @ApiProperty({ description: 'Email of the user', uniqueItems: true })
-  @Column({ unique: true })
-  email: string;
+  @ApiProperty({ enum: UserType, example: UserType.API, default: UserType.INTERNAL })
+  @Column({ type: 'enum', enum: UserType, default: UserType.INTERNAL })
+  type: UserType;
 
-  @ApiProperty({ description: 'Hashed password of the user' })
-  @Column({ select: false })
-  password: string;
+  @ApiProperty({ description: 'Email of the user', uniqueItems: true, nullable: true })
+  @Column({ unique: true, nullable: true })
+  email?: string;
+
+  @ApiProperty({ description: 'Hashed password of the user', nullable: true })
+  @Column({ select: false, nullable: true })
+  password?: string;
+
+  @ApiProperty({ description: 'Secret used to log in', nullable: true })
+  @Column({ unique: true, select: false, nullable: true })
+  apiKey?: string;
 
   @ApiProperty({ description: 'Phone number of the user' })
   @Column({ type: 'character varying', nullable: true })

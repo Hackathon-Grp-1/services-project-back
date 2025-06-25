@@ -30,7 +30,7 @@ export class AuthController {
   @SwaggerAuthSignIn()
   @DisableActivityLogger()
   async signIn(@Body() singInDto: LoginDto): Promise<LoggedUserWithToken> {
-    return await this.authService.singIn(singInDto.email, singInDto.password);
+    return await this.authService.singInPassword(singInDto.email, singInDto.password);
   }
 
   @Get('profile')
