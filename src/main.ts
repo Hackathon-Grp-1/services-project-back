@@ -33,7 +33,7 @@ async function bootstrap() {
 
   SwaggerConfig(app, configService.get('api_version'));
 
-  await app.listen(PORT, () => logger.log(`🚀 REGISTRE DE SÉCURITÉ is running on: ${APP_URL}/${APP_ROUTE_PREFIX}`));
+  await app.listen(PORT, () => logger.log(`🚀 SERVICES is running on: ${APP_URL}/${APP_ROUTE_PREFIX}`));
 }
 
 void bootstrap();

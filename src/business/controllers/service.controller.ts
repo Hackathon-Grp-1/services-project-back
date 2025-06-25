@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { Resources } from '@src/activity-logger/types/resource.types';
 import { GetUser } from '@src/auth/decorators/user.decorator';
 import { ApiKeyGuard } from '@src/auth/guards/api-key.guard';
@@ -15,12 +15,12 @@ import { ServiceService } from '../services/service.service';
 @ApiTags(Resources.SERVICE)
 @SwaggerFailureResponse()
 @UseGuards(RolesGuard)
-@ApiBearerAuth()
 @Controller('services')
 export class ServiceController {
   constructor(private readonly serviceService: ServiceService) {}
 
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Post()
   @ApiResponse({
     status: 201,
@@ -32,6 +32,7 @@ export class ServiceController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Get()
   @ApiResponse({
     status: 200,
@@ -43,6 +44,7 @@ export class ServiceController {
   }
 
   @UseGuards(ApiKeyGuard)
+  @ApiSecurity('x-api-key')
   @Get('ia')
   @ApiResponse({
     status: 200,
@@ -54,6 +56,7 @@ export class ServiceController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Get('/by-user')
   @ApiResponse({
     status: 200,
@@ -65,6 +68,7 @@ export class ServiceController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Get('type/:type')
   @ApiResponse({
     status: 200,
@@ -76,6 +80,7 @@ export class ServiceController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Get(':id')
   @ApiResponse({
     status: 200,
@@ -87,6 +92,7 @@ export class ServiceController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Put(':id')
   @ApiResponse({
     status: 200,

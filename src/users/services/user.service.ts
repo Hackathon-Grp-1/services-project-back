@@ -89,7 +89,24 @@ export class UserService {
   }
 
   async findAllApiKey(): Promise<User[]> {
-    return await this.userRepository.find({ where: { type: UserType.API }, withDeleted: true });
+    return await this.userRepository.find({
+      select: [
+        'firstName',
+        'apiKey',
+        'createdAt',
+        'deletedAt',
+        'email',
+        'id',
+        'lastName',
+        'password',
+        'phoneNumber',
+        'type',
+        'updatedAt',
+      ],
+      relations: { role: true },
+      where: { type: UserType.API },
+      withDeleted: true,
+    });
   }
 
   /**
