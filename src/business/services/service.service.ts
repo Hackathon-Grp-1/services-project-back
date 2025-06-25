@@ -15,7 +15,7 @@ export class ServiceService {
     @InjectRepository(Service)
     private readonly serviceRepository: Repository<Service>,
     private readonly userService: UserService,
-  ) { }
+  ) {}
 
   async create(createServiceDto: CreateServiceDto): Promise<Service> {
     const { user, organization, ...rest } = createServiceDto;
@@ -85,17 +85,21 @@ export class ServiceService {
     return this.serviceRepository.save(service);
   }
 
+  async findAll() {
+    return await this.serviceRepository.find({});
+  }
+
   async findAllByUser(userId: number): Promise<Service[]> {
-    return this.serviceRepository.find({
+    return await this.serviceRepository.find({
       where: { userId },
-      relations: ['organization']
+      relations: ['organization'],
     });
   }
 
   async findOne(id: number): Promise<Service> {
     const service = await this.serviceRepository.findOne({
       where: { id },
-      relations: ['organization']
+      relations: ['organization'],
     });
     if (!service) {
       throw new BadRequestException(`Service with ID ${id} not found`);
@@ -106,7 +110,7 @@ export class ServiceService {
   async findByType(type: 'human_provider' | 'ai_agent'): Promise<Service[]> {
     return this.serviceRepository.find({
       where: { serviceType: type },
-      relations: ['organization']
+      relations: ['organization'],
     });
   }
 
