@@ -1,6 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { ArrayNotEmpty, IsArray, IsEnum, IsInt, IsNumber, IsOptional, IsPositive, IsString, ValidateIf } from 'class-validator';
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsEnum,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsPositive,
+  IsString,
+  ValidateIf,
+} from 'class-validator';
 
 export class CreateServiceDto {
   @ApiProperty({ type: String, description: 'Type de service: "human_provider" ou "ai_agent"' })
@@ -14,28 +24,27 @@ export class CreateServiceDto {
   user: number;
 
   @ApiProperty({ required: false, description: 'Prénom (requis pour les prestataires humains)' })
-  @ValidateIf(o => o.serviceType === 'human_provider')
+  @ValidateIf((o: CreateServiceDto) => o.serviceType === 'human_provider')
   @IsString()
   firstName?: string;
 
   @ApiProperty({ required: false, description: 'Nom de famille (requis pour les prestataires humains)' })
-  @ValidateIf(o => o.serviceType === 'human_provider')
+  @ValidateIf((o: CreateServiceDto) => o.serviceType === 'human_provider')
   @IsString()
   lastName?: string;
 
-  @ApiProperty({ required: false, description: 'Nom de l\'agent IA (requis pour les agents IA)' })
-  @ValidateIf(o => o.serviceType === 'ai_agent')
+  @ApiProperty({ required: false, description: "Nom de l'agent IA (requis pour les agents IA)" })
+  @ValidateIf((o: CreateServiceDto) => o.serviceType === 'ai_agent')
   @IsString()
   aiAgentName?: string;
 
   @ApiProperty({ required: false, type: 'number' })
   @IsOptional()
-  @Type(() => Number)
   @IsInt()
-  organization?: number;
+  organization?: string;
 
   @ApiProperty({ required: false, description: 'Téléphone (requis pour les prestataires humains)' })
-  @ValidateIf(o => o.serviceType === 'human_provider')
+  @ValidateIf((o: CreateServiceDto) => o.serviceType === 'human_provider')
   @IsString()
   phone?: string;
 
@@ -57,7 +66,7 @@ export class CreateServiceDto {
   @IsString({ each: true })
   skills: string[];
 
-  @ApiProperty({ description: 'Domaine d\'expertise' })
+  @ApiProperty({ description: "Domaine d'expertise" })
   @IsString()
   domain: string;
 
@@ -69,13 +78,17 @@ export class CreateServiceDto {
   @IsString()
   shortSkillsDescription: string;
 
-  @ApiProperty({ required: false, description: 'Modèle d\'IA utilisé (requis pour les agents IA)' })
-  @ValidateIf(o => o.serviceType === 'ai_agent')
+  @ApiProperty({ required: false, description: "Modèle d'IA utilisé (requis pour les agents IA)" })
+  @ValidateIf((o: CreateServiceDto) => o.serviceType === 'ai_agent')
   @IsString()
   aiModel?: string;
 
-  @ApiProperty({ required: false, description: 'Version de l\'agent IA (requis pour les agents IA)' })
-  @ValidateIf(o => o.serviceType === 'ai_agent')
+  @ApiProperty({ required: false, description: "Version de l'agent IA (requis pour les agents IA)" })
+  @ValidateIf((o: CreateServiceDto) => o.serviceType === 'ai_agent')
   @IsString()
   aiVersion?: string;
+
+  @ApiProperty({ description: 'Localisation (ville, pays...)' })
+  @IsString()
+  localization: string;
 }
