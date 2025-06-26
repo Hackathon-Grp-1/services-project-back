@@ -248,7 +248,7 @@ export class UserService {
     await this.userRepository.save(user);
 
     // Construire le lien de reset
-    const resetLink = `${this.configService.get('front_url')}/forgot-password?token=${token}`;
+    const resetLink = `${this.configService.get('front_url')}/reset-password-confirm?token=${token}`;
 
     const htmlContent = `
       <!DOCTYPE html>
