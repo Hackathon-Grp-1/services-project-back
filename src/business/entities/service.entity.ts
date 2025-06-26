@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { User } from '@src/users/entities/user.entity';
+import { Column, Entity, ManyToOne, Relation } from 'typeorm';
 import { SoftDeleteEntity } from '../../common/entities/soft-delete.entity';
 
 @Entity('services')
@@ -9,7 +10,7 @@ export class Service extends SoftDeleteEntity {
     name: 'service_type',
     type: 'enum',
     enum: ['human_provider', 'ai_agent'],
-    default: 'human_provider'
+    default: 'human_provider',
   })
   serviceType: 'human_provider' | 'ai_agent';
 
@@ -21,7 +22,7 @@ export class Service extends SoftDeleteEntity {
   @Column({ name: 'last_name', type: 'varchar', length: 64, nullable: true })
   lastName?: string;
 
-  @ApiProperty({ required: false, description: 'Nom de l\'agent IA' })
+  @ApiProperty({ required: false, description: "Nom de l'agent IA" })
   @Column({ name: 'ai_agent_name', type: 'varchar', length: 128, nullable: true })
   aiAgentName?: string;
 
@@ -53,6 +54,10 @@ export class Service extends SoftDeleteEntity {
   @Column({ name: 'domains', type: 'simple-array' })
   domains: string[];
 
+  @ApiProperty({ description: 'Localisation (ville, pays...)' })
+  @Column({ name: 'localization', type: 'varchar', length: 256 })
+  localization: string;
+
   @ApiProperty({ description: 'Description professionnelle courte' })
   @Column({ name: 'short_professional_description', type: 'varchar', length: 256 })
   shortProfessionalDescription: string;
@@ -61,18 +66,18 @@ export class Service extends SoftDeleteEntity {
   @Column({ name: 'short_skills_description', type: 'varchar', length: 256 })
   shortSkillsDescription: string;
 
-  @ApiProperty({ required: false, description: 'Modèle d\'IA utilisé (pour les agents IA)' })
+  @ApiProperty({ required: false, description: "Modèle d'IA utilisé (pour les agents IA)" })
   @Column({ name: 'ai_model', type: 'varchar', length: 128, nullable: true })
   aiModel?: string;
 
-  @ApiProperty({ required: false, description: 'Version de l\'agent IA' })
+  @ApiProperty({ required: false, description: "Version de l'agent IA" })
   @Column({ name: 'ai_version', type: 'varchar', length: 32, nullable: true })
   aiVersion?: string;
 
-  @ApiProperty({ description: 'ID de l\'utilisateur propriétaire' })
+  @ApiProperty({ description: "ID de l'utilisateur propriétaire" })
   @Column({ name: 'user_id', type: 'int' })
   userId: number;
 
   @ManyToOne('User', 'services', { nullable: false })
-  user: any;
+  user: Relation<User>;
 }

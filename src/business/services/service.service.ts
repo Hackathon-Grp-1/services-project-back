@@ -18,18 +18,29 @@ export class ServiceService {
   async create(createServiceDto: CreateServiceDto): Promise<Service> {
     const { user, organization, ...rest } = createServiceDto;
 
-    // Validation spécifique au type de service
-    this.validateServiceData(rest);
-
     // Check user
     const userEntity = await this.userService.findOneById(user);
     if (!userEntity) throw new UserNotFoundException({ id: user });
 
-    const service = new Service();
-    Object.assign(service, {
+    // Check organization if provided
+    // let orgEntity: Organization | undefined = undefined;
+    // if (organization) {
+    //   const foundOrg = await this.serviceRepository.manager.findOne(Organization, { where: { id: organization } });
+    //   if (!foundOrg) throw new OrganizationNotFoundException({ id: organization });
+    //   orgEntity = foundOrg;
+    // }
+
+    const service = this.serviceRepository.create({
       ...rest,
       userId: user,
+      // organization: orgEntity,
       organization: organization || undefined,
+      domains: Array.isArray(rest.domains)
+        ? rest.domains
+        : typeof rest.domains === 'string'
+          ? rest.domains.split(',').map((d: string) => d.trim())
+          : [],
+      localization: rest.localization,
     });
 
     return this.serviceRepository.save(service);
@@ -39,11 +50,6 @@ export class ServiceService {
     const service = await this.serviceRepository.findOne({ where: { id } });
     if (!service) {
       throw new BadRequestException(`Service with ID ${id} not found`);
-    }
-
-    // Si le type de service change, valider les nouvelles données
-    if (updateServiceDto.serviceType && updateServiceDto.serviceType !== service.serviceType) {
-      this.validateServiceData({ ...service, ...updateServiceDto });
     }
 
     const { user, organization, ...rest } = updateServiceDto;
@@ -60,6 +66,12 @@ export class ServiceService {
       ...rest,
       userId,
       organization: organization !== undefined ? organization : service.organization,
+      domains: rest.domains
+        ? Array.isArray(rest.domains)
+          ? rest.domains
+          : rest.domains.split(',').map((d: string) => d.trim())
+        : service.domains,
+      localization: rest.localization ?? service.localization,
     });
 
     return this.serviceRepository.save(service);
@@ -104,29 +116,5 @@ export class ServiceService {
     return this.serviceRepository.find({
       where: { serviceType: type },
     });
-  }
-
-  private validateServiceData(data: any): void {
-    if (data.serviceType === 'human_provider') {
-      if (!data.firstName) {
-        throw new BadRequestException('firstName is required for human providers');
-      }
-      if (!data.lastName) {
-        throw new BadRequestException('lastName is required for human providers');
-      }
-      if (!data.phone) {
-        throw new BadRequestException('phone is required for human providers');
-      }
-    } else if (data.serviceType === 'ai_agent') {
-      if (!data.aiAgentName) {
-        throw new BadRequestException('aiAgentName is required for AI agents');
-      }
-      if (!data.aiModel) {
-        throw new BadRequestException('aiModel is required for AI agents');
-      }
-      if (!data.aiVersion) {
-        throw new BadRequestException('aiVersion is required for AI agents');
-      }
-    }
   }
 }
