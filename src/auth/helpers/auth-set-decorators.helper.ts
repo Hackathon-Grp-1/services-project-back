@@ -4,6 +4,7 @@ import {
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiTooManyRequestsResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { FormattedCreatedUserDto } from '@src/users/dto/user/create-user.dto';
@@ -30,7 +31,10 @@ export const SwaggerAuthCreateUserRequest = () => {
 
 export const SwaggerAuthContact = () => {
   return applyDecorators(
-    ApiOperation({ summary: 'Send a contact form message to admin' }),
+    ApiOperation({
+      summary: 'Send a contact form message to admin',
+      description: 'Rate limited to 10 requests per hour per IP address',
+    }),
     ApiOkResponse({
       description: 'The contact message has been successfully sent',
       schema: {
@@ -45,6 +49,15 @@ export const SwaggerAuthContact = () => {
     }),
     ApiBadRequestResponse({
       description: 'Bad request - validation error',
+    }),
+    ApiTooManyRequestsResponse({
+      description: 'Rate limit exceeded - too many requests',
+      schema: {
+        example: {
+          statusCode: 429,
+          message: 'ThrottlerException: Too Many Requests',
+        },
+      },
     }),
   );
 };

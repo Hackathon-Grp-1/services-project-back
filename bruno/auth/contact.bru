@@ -28,10 +28,12 @@ docs {
 
   This endpoint allows users to send contact form messages to the admin.
 
+  **⚠️ Rate Limiting:** This endpoint is limited to 10 requests per hour per IP address.
+
   ## Request Body
 
-  - `firstname` (string, required): First name of the person contacting
-  - `lastname` (string, required): Last name of the person contacting  
+  - `firstName` (string, required): First name of the person contacting
+  - `lastName` (string, required): Last name of the person contacting  
   - `email` (string, required): Email address of the person contacting
   - `phone` (string, optional): Phone number of the person contacting
   - `subject` (string, required): Subject of the contact message
@@ -44,6 +46,17 @@ docs {
   ```json
   {
     "message": "Contact message sent successfully"
+  }
+  ```
+
+  ## Rate Limit Response
+
+  When rate limit is exceeded (429 status):
+
+  ```json
+  {
+    "statusCode": 429,
+    "message": "ThrottlerException: Too Many Requests"
   }
   ```
 } 
