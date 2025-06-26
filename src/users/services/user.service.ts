@@ -210,13 +210,234 @@ export class UserService {
     await this.userRepository.save(user);
 
     // Construire le lien de reset
-    const resetLink = `${this.configService.get('app_url')}/reset-password/confirm?token=${token}`;
+    const resetLink = `${this.configService.get('app_url')}/forgot-password?token=${token}`;
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html lang="fr">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Demande de Réinitialisation de Mot de Passe</title>
+        <style>
+          body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+          }
+          .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+          }
+          .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+          }
+          .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+          }
+          .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 14px;
+          }
+          .content {
+            padding: 30px;
+          }
+          .greeting {
+            margin-bottom: 25px;
+            color: #495057;
+            font-size: 16px;
+          }
+          .reset-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+          }
+          .reset-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+          }
+          .info-box {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 25px 0;
+            border-left: 4px solid #ffc107;
+          }
+          .info-box h3 {
+            margin: 0 0 10px 0;
+            color: #856404;
+            font-size: 16px;
+            font-weight: 600;
+          }
+          .info-box ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #856404;
+          }
+          .info-box li {
+            margin-bottom: 5px;
+          }
+          .security-notice {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 25px 0;
+            color: #0c5460;
+          }
+          .security-notice h4 {
+            margin: 0 0 10px 0;
+            color: #0c5460;
+            font-size: 14px;
+            font-weight: 600;
+          }
+          .footer {
+            background-color: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+            color: #6c757d;
+            font-size: 12px;
+          }
+          .expiry-info {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+            color: #856404;
+          }
+          .expiry-info strong {
+            color: #856404;
+          }
+          @media only screen and (max-width: 600px) {
+            .container {
+              margin: 10px;
+              border-radius: 4px;
+            }
+            .header, .content {
+              padding: 20px;
+            }
+            .reset-button {
+              display: block;
+              width: 100%;
+              box-sizing: border-box;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🔐 Demande de Réinitialisation de Mot de Passe</h1>
+            <p>Nous avons reçu une demande de réinitialisation de votre mot de passe</p>
+          </div>
+          
+          <div class="content">
+            <div class="greeting">
+              Bonjour ${user.firstName} ${user.lastName},
+            </div>
+            
+            <p>Nous avons reçu une demande de réinitialisation du mot de passe de votre compte. Si vous êtes à l'origine de cette demande, veuillez cliquer sur le bouton ci-dessous pour créer un nouveau mot de passe :</p>
+            
+            <div style="text-align: center;">
+              <a href="${resetLink}" class="reset-button">
+                🔑 Réinitialiser Mon Mot de Passe
+              </a>
+            </div>
+            
+            <div class="expiry-info">
+              <strong>⏰ Ce lien expirera dans 1 heure</strong><br>
+              Pour des raisons de sécurité, veuillez compléter votre réinitialisation de mot de passe dans ce délai.
+            </div>
+            
+            <div class="info-box">
+              <h3>📋 Que se passe-t-il ensuite ?</h3>
+              <ul>
+                <li>Cliquez sur le bouton "Réinitialiser Mon Mot de Passe" ci-dessus</li>
+                <li>Vous serez redirigé vers une page sécurisée pour saisir votre nouveau mot de passe</li>
+                <li>Votre nouveau mot de passe sera immédiatement actif</li>
+                <li>Vous pourrez ensuite vous connecter avec votre nouveau mot de passe</li>
+              </ul>
+            </div>
+            
+            <div class="security-notice">
+              <h4>🔒 Avis de Sécurité</h4>
+              <p>Si vous n'êtes pas à l'origine de cette demande de réinitialisation de mot de passe, veuillez ignorer cet email. Votre mot de passe restera inchangé. Pour une sécurité supplémentaire, vous pourriez vouloir changer votre mot de passe lors de votre prochaine connexion.</p>
+            </div>
+            
+            <p>Si le bouton ci-dessus ne fonctionne pas, vous pouvez copier et coller ce lien dans votre navigateur :</p>
+            <p style="word-break: break-all; color: #667eea; font-size: 12px; background-color: #f8f9fa; padding: 10px; border-radius: 4px; border: 1px solid #e9ecef;">
+              ${resetLink}
+            </p>
+          </div>
+          
+          <div class="footer">
+            <p>Ceci est un message automatique de votre système de sécurité de compte.</p>
+            <p>Si vous avez des questions, veuillez contacter notre équipe de support.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const textContent = `
+DEMANDE DE RÉINITIALISATION DE MOT DE PASSE
+===========================================
+
+Bonjour ${user.firstName} ${user.lastName},
+
+Nous avons reçu une demande de réinitialisation du mot de passe de votre compte. Si vous êtes à l'origine de cette demande, veuillez utiliser le lien ci-dessous pour créer un nouveau mot de passe :
+
+${resetLink}
+
+INFORMATIONS IMPORTANTES :
+- Ce lien expirera dans 1 heure
+- Pour des raisons de sécurité, veuillez compléter votre réinitialisation de mot de passe dans ce délai
+
+QUE SE PASSE-T-IL ENSUITE :
+1. Cliquez sur le lien ci-dessus
+2. Vous serez redirigé vers une page sécurisée pour saisir votre nouveau mot de passe
+3. Votre nouveau mot de passe sera immédiatement actif
+4. Vous pourrez ensuite vous connecter avec votre nouveau mot de passe
+
+AVIS DE SÉCURITÉ :
+Si vous n'êtes pas à l'origine de cette demande de réinitialisation de mot de passe, veuillez ignorer cet email. Votre mot de passe restera inchangé. Pour une sécurité supplémentaire, vous pourriez vouloir changer votre mot de passe lors de votre prochaine connexion.
+
+---
+Ceci est un message automatique de votre système de sécurité de compte.
+Si vous avez des questions, veuillez contacter notre équipe de support.
+    `;
 
     // Envoyer le mail
     await this.mailerService.sendMail({
       to: user.email!,
-      subject: 'Password Reset Request',
-      html: `<p>To reset your password, click <a href="${resetLink}">here</a>. This link is valid for 1 hour.</p>`,
+      subject: 'Demande de Réinitialisation de Mot de Passe - Action Requise',
+      html: htmlContent,
+      text: textContent,
     });
   }
 
