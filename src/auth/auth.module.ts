@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { MailerService } from '@src/common/services/mailer.service';
 import configuration from '@src/config/helpers/api-config.config';
 import { ApiConfigService } from '@src/config/services/api-config.service';
 import { UserModule } from '@src/users/user.module';
@@ -24,7 +25,7 @@ const configService = new ApiConfigService(nestConfigService);
     UserModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, ApiKeyStrategy],
+  providers: [AuthService, JwtStrategy, ApiKeyStrategy, MailerService],
   exports: [AuthService],
 })
 export class AuthModule {}

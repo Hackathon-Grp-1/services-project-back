@@ -39,6 +39,12 @@ const configuration = () => ({
     pass: process.env.MAIL_PASS ?? '',
     from: process.env.MAIL_FROM ?? 'noreply@example.com',
     secure: process.env.MAIL_SECURE === 'true',
+    admin: process.env.MAIL_ADMIN ?? '',
+  },
+
+  throttler: {
+    ttl: parseInt(process.env.THROTTLER_TTL ?? '3600000', 10),
+    limit: parseInt(process.env.THROTTLER_LIMIT ?? '10', 10),
   },
 });
 
