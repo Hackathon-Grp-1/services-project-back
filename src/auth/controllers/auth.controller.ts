@@ -5,10 +5,15 @@ import { Resources } from '@src/activity-logger/types/resource.types';
 import { SwaggerFailureResponse } from '@src/common/helpers/common-set-decorators.helper';
 import { FormattedCreatedUserDto } from '@src/users/dto/user/create-user.dto';
 import { Request as ExpressRequest } from 'express';
+import { ContactDto } from '../dtos/contact.dto';
 import { CreateUserRequestDto } from '../dtos/create-user-request.dto';
 import { LoginDto } from '../dtos/login.dto';
 import { JwtAuthGuard } from '../guards/jwt.guard';
-import { SwaggerAuthCreateUserRequest, SwaggerAuthSignIn } from '../helpers/auth-set-decorators.helper';
+import {
+  SwaggerAuthContact,
+  SwaggerAuthCreateUserRequest,
+  SwaggerAuthSignIn,
+} from '../helpers/auth-set-decorators.helper';
 import { UserRequestNotFoundException } from '../helpers/auth.exception';
 import { LoggedUser, LoggedUserWithToken } from '../types/logged-user.type';
 import { AuthService } from './../services/auth.service';
@@ -50,5 +55,18 @@ export class AuthController {
   @SwaggerAuthCreateUserRequest()
   async createUserRequest(@Body() createUserRequestDto: CreateUserRequestDto): Promise<FormattedCreatedUserDto> {
     return await this.authService.createUserRequest(createUserRequestDto);
+  }
+
+  /**
+   * Send a contact form message to admin.
+   * @param contactDto The contact form data
+   * @returns Success message
+   */
+  @HttpCode(HttpStatus.OK)
+  @Post('contact')
+  @SwaggerAuthContact()
+  @DisableActivityLogger()
+  async sendContact(@Body() contactDto: ContactDto): Promise<{ message: string }> {
+    return await this.authService.sendContactEmail(contactDto);
   }
 }

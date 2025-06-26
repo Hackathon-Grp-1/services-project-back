@@ -39,6 +39,7 @@ const configuration = () => ({
     pass: process.env.MAIL_PASS ?? '',
     from: process.env.MAIL_FROM ?? 'noreply@example.com',
     secure: process.env.MAIL_SECURE === 'true',
+    admin: process.env.MAIL_ADMIN ?? '',
   },
 });
 

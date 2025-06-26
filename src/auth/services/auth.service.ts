@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { MailerService } from '@src/common/services/mailer.service';
+import { ApiConfigService } from '@src/config/services/api-config.service';
 import { CreateUserDto, FormattedCreatedUserDto } from '@src/users/dto/user/create-user.dto';
 import { UserDeactivateException } from '@src/users/helpers/exceptions/user.exception';
 import { UserService } from '@src/users/services/user.service';
 import { RoleType } from '@src/users/types/role.types';
+import { ContactDto } from '../dtos/contact.dto';
 import { CreateUserRequestDto } from '../dtos/create-user-request.dto';
 import { ApiKey } from '../helpers/api-key.utils';
 import { InvalidApiKeyException, InvalidCredentialsException } from '../helpers/auth.exception';
@@ -15,6 +18,8 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly mailerService: MailerService,
+    private readonly configService: ApiConfigService,
   ) {}
 
   async singInPassword(email: string, password: string): Promise<LoggedUserWithToken> {
@@ -66,5 +71,33 @@ export class AuthService {
     };
 
     return await this.userService.create(createUserDto);
+  }
+
+  /**
+   * Sends a contact form email to admin.
+   * @param contactDto The contact form data
+   * @returns Success message
+   */
+  async sendContactEmail(contactDto: ContactDto): Promise<{ message: string }> {
+    const { firstName, lastName, email, phone, subject, message } = contactDto;
+
+    const htmlContent = `
+      <h2>New Contact Form Submission</h2>
+      <p><strong>From:</strong> ${firstName} ${lastName}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ''}
+      <p><strong>Subject:</strong> ${subject}</p>
+      <hr>
+      <h3>Message:</h3>
+      <p>${message.replace(/\n/g, '<br>')}</p>
+    `;
+
+    await this.mailerService.sendMail({
+      to: this.configService.get('mail.admin'),
+      subject: `Contact Form: ${subject}`,
+      html: htmlContent,
+    });
+
+    return { message: 'Contact message sent successfully' };
   }
 }
