@@ -9,11 +9,12 @@ export interface BaseServiceData {
   professionalDescription: string;
   skillsDescription: string;
   skills: string[];
-  domain: string;
+  domains: string[];
   shortProfessionalDescription: string;
   shortSkillsDescription: string;
   organizationId?: number;
   userId: number;
+  localization: string;
 }
 
 export interface HumanProviderData extends BaseServiceData {
@@ -43,7 +44,8 @@ export interface ServiceResponse {
   professionalDescription: string;
   skillsDescription: string;
   skills: string[];
-  domain: string;
+  domains: string[];
+  localization: string;
   shortProfessionalDescription: string;
   shortSkillsDescription: string;
   aiModel?: string;

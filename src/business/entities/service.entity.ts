@@ -54,9 +54,9 @@ export class Service extends SoftDeleteEntity {
   @Column({ name: 'domains', type: 'simple-array' })
   domains: string[];
 
-  @ApiProperty({ description: 'Localisation (ville, pays...)' })
-  @Column({ name: 'localization', type: 'varchar', length: 256 })
-  localization: string;
+  @ApiProperty({ required: false, description: 'Localisation (ville, pays...)' })
+  @Column({ name: 'localization', type: 'varchar', length: 256, nullable: true })
+  localization?: string;
 
   @ApiProperty({ description: 'Description professionnelle courte' })
   @Column({ name: 'short_professional_description', type: 'varchar', length: 256 })

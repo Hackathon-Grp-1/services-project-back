@@ -6,14 +6,14 @@ export class UpdateService1750848681952 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
         ALTER TABLE "services"
-        ADD "localization" character varying(256) NOT NULL
+        ADD "localization" character varying(256)
     `);
     await queryRunner.query(`
         ALTER TABLE "services" DROP COLUMN "domain"
     `);
     await queryRunner.query(`
         ALTER TABLE "services"
-        ADD "domain" character varying(64) array NOT NULL
+        ADD "domain" character varying(64) array
     `);
   }
 

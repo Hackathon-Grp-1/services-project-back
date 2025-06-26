@@ -66,7 +66,7 @@ export class CreateServiceDto {
   @IsString({ each: true })
   skills: string[];
 
-  @ApiProperty({ description: 'Domaines d\'expertise' })
+  @ApiProperty({ type: [String], description: 'Domaines d\'expertise' })
   @IsArray()
   @ArrayNotEmpty()
   @IsString({ each: true })

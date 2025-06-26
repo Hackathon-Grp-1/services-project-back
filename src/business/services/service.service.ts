@@ -35,11 +35,7 @@ export class ServiceService {
       userId: user,
       // organization: orgEntity,
       organization: organization || undefined,
-      domains: Array.isArray(rest.domains)
-        ? rest.domains
-        : typeof rest.domains === 'string'
-          ? rest.domains.split(',').map((d: string) => d.trim())
-          : [],
+      domains: rest.domains,
       localization: rest.localization,
     });
 
@@ -66,11 +62,7 @@ export class ServiceService {
       ...rest,
       userId,
       organization: organization !== undefined ? organization : service.organization,
-      domains: rest.domains
-        ? Array.isArray(rest.domains)
-          ? rest.domains
-          : rest.domains.split(',').map((d: string) => d.trim())
-        : service.domains,
+      domains: rest.domains ?? service.domains,
       localization: rest.localization ?? service.localization,
     });
 
