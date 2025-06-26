@@ -15,9 +15,9 @@ import { ServiceService } from '../services/service.service';
 @ApiTags(Resources.SERVICE)
 @SwaggerFailureResponse()
 @UseGuards(RolesGuard)
-@Controller('services')
+@Controller({ path: 'services', version: ['1'] })
 export class ServiceController {
-  constructor(private readonly serviceService: ServiceService) {}
+  constructor(private readonly serviceService: ServiceService) { }
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

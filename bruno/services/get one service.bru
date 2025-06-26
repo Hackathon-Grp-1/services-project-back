@@ -1,0 +1,19 @@
+meta {
+  name: get one service
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{base_url}}/services/{{id}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+vars:pre-request {
+  id: 1
+} 

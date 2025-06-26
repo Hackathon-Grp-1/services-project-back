@@ -1,0 +1,15 @@
+meta {
+  name: get all services ia
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}/services/ia
+  body: none
+  auth: api-key
+}
+
+auth:api-key {
+  key: {{api_key}}
+} 

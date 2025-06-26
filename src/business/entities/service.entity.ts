@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { SoftDeleteEntity } from '../../common/entities/soft-delete.entity';
-import { Organization } from './organization.entity';
 
 @Entity('services')
 export class Service extends SoftDeleteEntity {
@@ -26,9 +25,9 @@ export class Service extends SoftDeleteEntity {
   @Column({ name: 'ai_agent_name', type: 'varchar', length: 128, nullable: true })
   aiAgentName?: string;
 
-  @ApiProperty({ required: false, type: () => Organization })
-  @ManyToOne(() => Organization, { nullable: true })
-  organization?: Organization;
+  @ApiProperty({ required: false, description: 'Nom de l\'organisation' })
+  @Column({ name: 'organization', type: 'varchar', length: 128, nullable: true })
+  organization?: string;
 
   @ApiProperty({ required: false, description: 'Téléphone (pour les prestataires humains)' })
   @Column({ name: 'phone', type: 'varchar', length: 32, nullable: true })
@@ -50,9 +49,9 @@ export class Service extends SoftDeleteEntity {
   @Column({ name: 'skills', type: 'simple-array' })
   skills: string[];
 
-  @ApiProperty({ description: 'Domaine d\'expertise' })
-  @Column({ name: 'domain', type: 'varchar', length: 64 })
-  domain: string;
+  @ApiProperty({ description: 'Domaines d\'expertise' })
+  @Column({ name: 'domains', type: 'simple-array' })
+  domains: string[];
 
   @ApiProperty({ description: 'Description professionnelle courte' })
   @Column({ name: 'short_professional_description', type: 'varchar', length: 256 })

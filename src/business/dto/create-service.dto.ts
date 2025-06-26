@@ -28,11 +28,10 @@ export class CreateServiceDto {
   @IsString()
   aiAgentName?: string;
 
-  @ApiProperty({ required: false, type: 'number' })
+  @ApiProperty({ required: false, description: 'Nom de l\'organisation' })
   @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  organization?: number;
+  @IsString()
+  organization?: string;
 
   @ApiProperty({ required: false, description: 'Téléphone (requis pour les prestataires humains)' })
   @ValidateIf(o => o.serviceType === 'human_provider')
@@ -57,9 +56,11 @@ export class CreateServiceDto {
   @IsString({ each: true })
   skills: string[];
 
-  @ApiProperty({ description: 'Domaine d\'expertise' })
-  @IsString()
-  domain: string;
+  @ApiProperty({ description: 'Domaines d\'expertise' })
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsString({ each: true })
+  domains: string[];
 
   @ApiProperty({ description: 'Description professionnelle courte' })
   @IsString()

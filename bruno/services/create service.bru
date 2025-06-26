@@ -1,0 +1,36 @@
+meta {
+  name: create service
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/services
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "serviceType": "human_provider",
+    "user": 1,
+    "firstName": "John",
+    "lastName": "Doe",
+    "aiAgentName": "Assistant IA",
+    "organization": "Ma Société",
+    "phone": "+33 6 12 34 56 78",
+    "hourlyRate": 50.00,
+    "professionalDescription": "Développeur full-stack expérimenté avec 5 ans d'expérience",
+    "skillsDescription": "React, Node.js, TypeScript, PostgreSQL, Docker",
+    "skills": ["React", "Node.js", "TypeScript", "PostgreSQL", "Docker"],
+    "domains": ["Développement web", "test"],
+    "shortProfessionalDescription": "Développeur full-stack",
+    "shortSkillsDescription": "React, Node.js, TypeScript",
+    "aiModel": "gpt-4",
+    "aiVersion": "1.0"
+  }
+}

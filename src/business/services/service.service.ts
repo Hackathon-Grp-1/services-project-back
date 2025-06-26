@@ -5,9 +5,7 @@ import { UserNotFoundException } from '../../users/helpers/exceptions/user.excep
 import { UserService } from '../../users/services/user.service';
 import { CreateServiceDto } from '../dto/create-service.dto';
 import { UpdateServiceDto } from '../dto/update-service.dto';
-import { Organization } from '../entities/organization.entity';
 import { Service } from '../entities/service.entity';
-import { OrganizationNotFoundException } from '../exceptions/organization.exception';
 
 @Injectable()
 export class ServiceService {
@@ -15,7 +13,7 @@ export class ServiceService {
     @InjectRepository(Service)
     private readonly serviceRepository: Repository<Service>,
     private readonly userService: UserService,
-  ) {}
+  ) { }
 
   async create(createServiceDto: CreateServiceDto): Promise<Service> {
     const { user, organization, ...rest } = createServiceDto;
@@ -27,19 +25,13 @@ export class ServiceService {
     const userEntity = await this.userService.findOneById(user);
     if (!userEntity) throw new UserNotFoundException({ id: user });
 
-    // Check organization if provided
-    let orgEntity: Organization | undefined = undefined;
-    if (organization) {
-      const foundOrg = await this.serviceRepository.manager.findOne(Organization, { where: { id: organization } });
-      if (!foundOrg) throw new OrganizationNotFoundException({ id: organization });
-      orgEntity = foundOrg;
-    }
-
-    const service = this.serviceRepository.create({
+    const service = new Service();
+    Object.assign(service, {
       ...rest,
       userId: user,
-      organization: orgEntity,
+      organization: organization || undefined,
     });
+
     return this.serviceRepository.save(service);
   }
 
@@ -64,22 +56,10 @@ export class ServiceService {
       userId = user;
     }
 
-    // Check organization if provided
-    let orgEntity = service.organization;
-    if (organization !== undefined) {
-      if (organization) {
-        const foundOrg = await this.serviceRepository.manager.findOne(Organization, { where: { id: organization } });
-        if (!foundOrg) throw new OrganizationNotFoundException({ id: organization });
-        orgEntity = foundOrg;
-      } else {
-        orgEntity = undefined;
-      }
-    }
-
     Object.assign(service, {
       ...rest,
       userId,
-      organization: orgEntity,
+      organization: organization !== undefined ? organization : service.organization,
     });
 
     return this.serviceRepository.save(service);
@@ -97,7 +77,7 @@ export class ServiceService {
         'organization',
         'hourlyRate',
         'skills',
-        'domain',
+        'domains',
         'shortProfessionalDescription',
         'shortSkillsDescription',
       ],
@@ -107,14 +87,12 @@ export class ServiceService {
   async findAllByUser(userId: number): Promise<Service[]> {
     return await this.serviceRepository.find({
       where: { userId },
-      relations: ['organization'],
     });
   }
 
   async findOne(id: number): Promise<Service> {
     const service = await this.serviceRepository.findOne({
       where: { id },
-      relations: ['organization'],
     });
     if (!service) {
       throw new BadRequestException(`Service with ID ${id} not found`);
@@ -125,7 +103,6 @@ export class ServiceService {
   async findByType(type: 'human_provider' | 'ai_agent'): Promise<Service[]> {
     return this.serviceRepository.find({
       where: { serviceType: type },
-      relations: ['organization'],
     });
   }
 

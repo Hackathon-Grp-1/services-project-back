@@ -1,0 +1,19 @@
+meta {
+  name: get services by type
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{base_url}}/services/type/{{type}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+vars:pre-request {
+  type: human_provider
+} 

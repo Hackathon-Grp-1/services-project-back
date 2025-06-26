@@ -1,0 +1,15 @@
+meta {
+  name: get services by user
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{base_url}}/services/by-user
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+} 

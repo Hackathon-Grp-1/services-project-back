@@ -1,0 +1,29 @@
+meta {
+  name: update service
+  type: http
+  seq: 7
+}
+
+put {
+  url: {{base_url}}/services/{{id}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "hourlyRate": 75.00,
+    "professionalDescription": "Développeuse full-stack senior avec 8 ans d'expérience",
+    "skills": ["React", "Node.js", "TypeScript", "PostgreSQL", "Docker", "Kubernetes"]
+  }
+}
+
+vars:pre-request {
+  id: 1
+} 
