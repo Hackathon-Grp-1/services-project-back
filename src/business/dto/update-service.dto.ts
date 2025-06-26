@@ -77,8 +77,10 @@ export class UpdateServiceDto {
 
   @ApiProperty({ required: false, description: "Domaine d'expertise" })
   @IsOptional()
-  @IsString()
-  domain?: string;
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsString({ each: true })
+  domains?: string[];
 
   @ApiProperty({ required: false, description: 'Description professionnelle courte' })
   @IsOptional()
