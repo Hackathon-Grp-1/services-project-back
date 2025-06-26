@@ -3,7 +3,6 @@ import { ApiTags } from '@nestjs/swagger';
 import { DisableActivityLogger } from '@src/activity-logger/helpers/disable-logger.decorator';
 import { Resources } from '@src/activity-logger/types/resource.types';
 import { SwaggerFailureResponse } from '@src/common/helpers/common-set-decorators.helper';
-import { FormattedCreatedUserDto } from '@src/users/dto/user/create-user.dto';
 import { Request as ExpressRequest } from 'express';
 import { ThrottleContact } from '../decorators/throttle-contact.decorator';
 import { ContactDto } from '../dtos/contact.dto';
@@ -54,7 +53,8 @@ export class AuthController {
    */
   @Post('register')
   @SwaggerAuthCreateUserRequest()
-  async createUserRequest(@Body() createUserRequestDto: CreateUserRequestDto): Promise<FormattedCreatedUserDto> {
+  @DisableActivityLogger()
+  async createUserRequest(@Body() createUserRequestDto: CreateUserRequestDto): Promise<{ message: string }> {
     return await this.authService.createUserRequest(createUserRequestDto);
   }
 

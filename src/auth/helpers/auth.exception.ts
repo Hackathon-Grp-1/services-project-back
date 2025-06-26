@@ -12,6 +12,7 @@ export enum AuthErrorCode {
   UNKNOWN_VALIDATE_ERROR = 'UNKNOWN_VALIDATE_ERROR',
   NO_API_KEY = 'NO_API_KEY',
   INVALID_API_KEY = 'INVALID_API_KEY',
+  EMAIL_NOT_CONFIRMED = 'EMAIL_NOT_CONFIRMED',
 }
 
 type ErrorCode = CommonErrorCode | AuthErrorCode;
@@ -35,6 +36,7 @@ export class AuthHttpException extends CustomHttpException {
       [AuthErrorCode.UNKNOWN_VALIDATE_ERROR]: 'Unknown error occurred during validation',
       [AuthErrorCode.NO_API_KEY]: 'No api key found in headers, key must be named X-API-KEY',
       [AuthErrorCode.INVALID_API_KEY]: 'Invalid API Key',
+      [AuthErrorCode.EMAIL_NOT_CONFIRMED]: 'Please verify your email before connection',
     };
 
     return messages[this.code] || null;
@@ -98,5 +100,11 @@ export class InvalidApiKeyException extends AuthHttpException {
 export class AuthNoApiKeyException extends AuthHttpException {
   constructor() {
     super(AuthErrorCode.NO_API_KEY, HttpStatus.UNAUTHORIZED);
+  }
+}
+
+export class EmailNotConfirmedException extends AuthHttpException {
+  constructor() {
+    super(AuthErrorCode.EMAIL_NOT_CONFIRMED, HttpStatus.UNAUTHORIZED);
   }
 }

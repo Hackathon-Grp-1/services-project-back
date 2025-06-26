@@ -1,0 +1,68 @@
+meta {
+  name: Register with Validation
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/v1/auth/register
+  body: json {
+    {
+      "firstName": "Jean",
+      "lastName": "Dupont",
+      "email": "jean.dupont@example.com",
+      "password": "SecurePassword123!",
+      "confirmPassword": "SecurePassword123!",
+      "phoneNumber": "+33123456789"
+    }
+  }
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+docs {
+  # Registration with Email Validation
+
+  This endpoint creates a new user account and sends a validation email.
+
+  ## Request Body
+
+  - `firstName` (string, required): First name of the user
+  - `lastName` (string, required): Last name of the user
+  - `email` (string, required): Email address (must be unique)
+  - `password` (string, required): User password
+  - `confirmPassword` (string, required): Password confirmation (must match)
+  - `phoneNumber` (string, optional): Phone number
+
+  ## Response
+
+  Returns a success message indicating that a validation email has been sent.
+
+  ```json
+  {
+    "message": "Un email de validation a été envoyé à votre adresse email. Veuillez vérifier votre boîte de réception et cliquer sur le lien de validation pour activer votre compte."
+  }
+  ```
+
+  ## Workflow
+
+  1. User submits registration form
+  2. System creates account with `emailConfirmed = false`
+  3. System generates validation token and stores it
+  4. System sends beautiful validation email with token
+  5. User clicks validation link or calls validation endpoint
+  6. Account is activated (`emailConfirmed = true`)
+  7. User can now log in
+
+  ## Email Template
+
+  The user will receive a beautifully formatted validation email with:
+  - Professional green gradient design
+  - Clear call-to-action button
+  - Welcome message and instructions
+  - 24-hour expiry notice
+  - Step-by-step guide
+} 

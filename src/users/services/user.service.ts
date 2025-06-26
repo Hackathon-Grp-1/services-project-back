@@ -11,7 +11,11 @@ import { UpdateUserDto } from '../dto/user/update-user.dto';
 import { UserQueryFilterDto } from '../dto/user/user-query-filter.dto';
 import { Role } from '../entities/role.entity';
 import { User } from '../entities/user.entity';
-import { RoleNotFoundException, UserEmailAlreadyExistsException } from '../helpers/exceptions/user.exception';
+import {
+  EmailConfirmationException,
+  RoleNotFoundException,
+  UserEmailAlreadyExistsException,
+} from '../helpers/exceptions/user.exception';
 import { UserType } from '../types/user.types';
 
 @Injectable()
@@ -24,6 +28,36 @@ export class UserService {
     private readonly mailerService: MailerService,
     private readonly configService: ApiConfigService,
   ) {}
+
+  /**
+   * Creates a new user with a validation token.
+   */
+  async createWithToken(createUserDto: CreateUserDto, token: string, tokenExpires: Date): Promise<User> {
+    const isUserExists = await this.emailAlreadyExists(createUserDto.email);
+    if (isUserExists) throw new UserEmailAlreadyExistsException({ email: createUserDto.email });
+
+    // Get role
+    const role = await this.roleRepository.findOneBy({ type: createUserDto.role });
+    if (!role) throw new RoleNotFoundException({ type: createUserDto.role });
+
+    // Hash password
+    const hashedPassword = Password.hash(createUserDto.password);
+
+    // construct object
+    const creatingUser = this.userRepository.create({
+      firstName: createUserDto.firstName,
+      lastName: createUserDto.lastName,
+      email: createUserDto.email,
+      phoneNumber: createUserDto.phoneNumber,
+      password: hashedPassword,
+      role: role,
+      emailConfirmed: false, // Email not confirmed by default
+      emailConfirmationToken: token,
+      emailConfirmationTokenExpires: tokenExpires,
+    });
+
+    return await this.userRepository.save(creatingUser);
+  }
 
   /**
    * Creates a new user.
@@ -52,9 +86,13 @@ export class UserService {
       phoneNumber: createUserDto.phoneNumber,
       password: hashedPassword,
       role: role,
+      emailConfirmed: false, // Email not confirmed by default
     });
 
     const createdUser = await this.userRepository.save(creatingUser);
+
+    // Send email confirmation
+    await this.sendEmailConfirmation(createdUser);
 
     const { password: _, ...user } = createdUser;
 
@@ -210,7 +248,7 @@ export class UserService {
     await this.userRepository.save(user);
 
     // Construire le lien de reset
-    const resetLink = `${this.configService.get('app_url')}/forgot-password?token=${token}`;
+    const resetLink = `${this.configService.get('front_url')}/forgot-password?token=${token}`;
 
     const htmlContent = `
       <!DOCTYPE html>
@@ -452,6 +490,265 @@ Si vous avez des questions, veuillez contacter notre équipe de support.
     user.password = Password.hash(newPassword);
     user.resetPasswordToken = null;
     user.resetPasswordTokenExpires = null;
+    await this.userRepository.save(user);
+  }
+
+  /**
+   * Envoie un email de confirmation pour activer le compte utilisateur.
+   */
+  async sendEmailConfirmation(user: User): Promise<void> {
+    // Générer un token temporaire
+    const token = randomBytes(32).toString('hex');
+
+    // Stocker le token et sa date d'expiration
+    user.emailConfirmationToken = token;
+    user.emailConfirmationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h
+    await this.userRepository.save(user);
+
+    // Construire le lien de confirmation
+    const confirmationLink = `${this.configService.get('front_url')}/email-validation?token=${token}`;
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html lang="fr">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Confirmation de Votre Compte</title>
+        <style>
+          body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+          }
+          .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+          }
+          .header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+          }
+          .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+          }
+          .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 14px;
+          }
+          .content {
+            padding: 30px;
+          }
+          .greeting {
+            margin-bottom: 25px;
+            color: #495057;
+            font-size: 16px;
+          }
+          .confirm-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+            transition: all 0.3s ease;
+          }
+          .confirm-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.4);
+          }
+          .info-box {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 25px 0;
+            border-left: 4px solid #28a745;
+          }
+          .info-box h3 {
+            margin: 0 0 10px 0;
+            color: #155724;
+            font-size: 16px;
+            font-weight: 600;
+          }
+          .info-box ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #155724;
+          }
+          .info-box li {
+            margin-bottom: 5px;
+          }
+          .welcome-notice {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 25px 0;
+            color: #0c5460;
+          }
+          .welcome-notice h4 {
+            margin: 0 0 10px 0;
+            color: #0c5460;
+            font-size: 14px;
+            font-weight: 600;
+          }
+          .footer {
+            background-color: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+            color: #6c757d;
+            font-size: 12px;
+          }
+          .expiry-info {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+            color: #856404;
+          }
+          .expiry-info strong {
+            color: #856404;
+          }
+          @media only screen and (max-width: 600px) {
+            .container {
+              margin: 10px;
+              border-radius: 4px;
+            }
+            .header, .content {
+              padding: 20px;
+            }
+            .confirm-button {
+              display: block;
+              width: 100%;
+              box-sizing: border-box;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🎉 Bienvenue ! Confirmez Votre Compte</h1>
+            <p>Votre compte a été créé avec succès</p>
+          </div>
+          
+          <div class="content">
+            <div class="greeting">
+              Bonjour ${user.firstName} ${user.lastName},
+            </div>
+            
+            <p>Merci de vous être inscrit ! Pour activer votre compte et commencer à utiliser nos services, veuillez confirmer votre adresse email en cliquant sur le bouton ci-dessous :</p>
+            
+            <div style="text-align: center;">
+              <a href="${confirmationLink}" class="confirm-button">
+                ✅ Confirmer Mon Compte
+              </a>
+            </div>
+            
+            <div class="expiry-info">
+              <strong>⏰ Ce lien expirera dans 24 heures</strong><br>
+              Pour des raisons de sécurité, veuillez confirmer votre compte dans ce délai.
+            </div>
+            
+            <div class="info-box">
+              <h3>📋 Que se passe-t-il ensuite ?</h3>
+              <ul>
+                <li>Cliquez sur le bouton "Confirmer Mon Compte" ci-dessus</li>
+                <li>Votre compte sera immédiatement activé</li>
+                <li>Vous pourrez vous connecter et accéder à tous nos services</li>
+                <li>Vous recevrez un email de bienvenue avec plus d'informations</li>
+              </ul>
+            </div>
+            
+            <div class="welcome-notice">
+              <h4>🌟 Bienvenue dans notre communauté !</h4>
+              <p>Nous sommes ravis de vous accueillir. Une fois votre compte confirmé, vous aurez accès à toutes nos fonctionnalités et pourrez commencer à utiliser nos services immédiatement.</p>
+            </div>
+            
+            <p>Si le bouton ci-dessus ne fonctionne pas, vous pouvez copier et coller ce lien dans votre navigateur :</p>
+            <p style="word-break: break-all; color: #28a745; font-size: 12px; background-color: #f8f9fa; padding: 10px; border-radius: 4px; border: 1px solid #e9ecef;">
+              ${confirmationLink}
+            </p>
+          </div>
+          
+          <div class="footer">
+            <p>Ceci est un message automatique de votre système d'inscription.</p>
+            <p>Si vous avez des questions, veuillez contacter notre équipe de support.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const textContent = `
+CONFIRMATION DE VOTRE COMPTE
+===========================
+
+Bonjour ${user.firstName} ${user.lastName},
+
+Merci de vous être inscrit ! Pour activer votre compte et commencer à utiliser nos services, veuillez confirmer votre adresse email en utilisant le lien ci-dessous :
+
+${confirmationLink}
+
+INFORMATIONS IMPORTANTES :
+- Ce lien expirera dans 24 heures
+- Pour des raisons de sécurité, veuillez confirmer votre compte dans ce délai
+
+QUE SE PASSE-T-IL ENSUITE :
+1. Cliquez sur le lien ci-dessus
+2. Votre compte sera immédiatement activé
+3. Vous pourrez vous connecter et accéder à tous nos services
+4. Vous recevrez un email de bienvenue avec plus d'informations
+
+BIENVENUE DANS NOTRE COMMUNAUTÉ !
+Nous sommes ravis de vous accueillir. Une fois votre compte confirmé, vous aurez accès à toutes nos fonctionnalités et pourrez commencer à utiliser nos services immédiatement.
+
+---
+Ceci est un message automatique de votre système d'inscription.
+Si vous avez des questions, veuillez contacter notre équipe de support.
+    `;
+
+    // Envoyer le mail
+    await this.mailerService.sendMail({
+      to: user.email!,
+      subject: 'Confirmation de Votre Compte - Action Requise',
+      html: htmlContent,
+      text: textContent,
+    });
+  }
+
+  /**
+   * Confirme l'email de l'utilisateur avec le token fourni.
+   */
+  async confirmEmail(token: string): Promise<void> {
+    const user = await this.userRepository.findOneBy({ emailConfirmationToken: token });
+    if (!user || !user.emailConfirmationTokenExpires || user.emailConfirmationTokenExpires < new Date()) {
+      throw new EmailConfirmationException();
+    }
+
+    user.emailConfirmed = true;
+    user.emailConfirmationToken = null;
+    user.emailConfirmationTokenExpires = null;
     await this.userRepository.save(user);
   }
 }

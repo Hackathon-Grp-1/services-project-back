@@ -1,0 +1,59 @@
+meta {
+  name: Validate Account
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/v1/users/email-validation
+  body: json {
+    {
+      "token": "your-account-validation-token-here"
+    }
+  }
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+docs {
+  # Account Validation
+
+  This endpoint validates a user account using the token received via email during registration.
+
+  ## Request Body
+
+  - `token` (string, required): The account validation token received via email
+
+  ## Response
+
+  Returns a success message when the account is validated successfully.
+
+  ```json
+  {
+    "message": "Account validated successfully. Your account is now active and you can log in."
+  }
+  ```
+
+  ## Workflow
+
+  1. User registers via `/auth/register`
+  2. System sends validation email with token
+  3. User clicks validation link or calls this endpoint
+  4. Account is activated (`emailConfirmed = true`)
+  5. User can now log in via `/auth/login`
+
+  ## Security Features
+
+  - Token expires after 24 hours
+  - Token is single-use only
+  - Account remains inactive until validation
+  - Users cannot log in without validation
+
+  ## Error Responses
+
+  - **Invalid Token**: If the token is invalid or expired
+  - **Already Confirmed**: If the account is already validated
+} 

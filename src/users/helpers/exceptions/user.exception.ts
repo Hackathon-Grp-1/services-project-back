@@ -7,6 +7,7 @@ export enum UserErrorCode {
   CANNOT_UPDATE_OWN_ACCOUNT_STATE = 'CANNOT_UPDATE_OWN_ACCOUNT_STATE',
   EMAIL_ALREADY_EXISTS = 'EMAIL_ALREADY_EXISTS',
   ROLE_NOT_FOUND = 'ROLE_NOT_FOUND',
+  EMAIL_CONFIRMATION = 'EMAIL_CONFIRMATION',
 }
 
 type ErrorCode = CommonErrorCode | UserErrorCode;
@@ -25,6 +26,7 @@ export class UserHttpException extends CustomHttpException {
       [UserErrorCode.CANNOT_UPDATE_OWN_ACCOUNT_STATE]: 'Current user cannot update this own account state',
       [UserErrorCode.EMAIL_ALREADY_EXISTS]: 'Email already exists in the database',
       [UserErrorCode.ROLE_NOT_FOUND]: 'Role not found in the database',
+      [UserErrorCode.EMAIL_CONFIRMATION]: 'Confirmation token invalid',
     };
 
     return messages[this.code] || null;
@@ -52,5 +54,11 @@ export class UserEmailAlreadyExistsException extends UserHttpException {
 export class RoleNotFoundException extends UserHttpException {
   constructor(details?: Record<string, string | number>) {
     super(UserErrorCode.ROLE_NOT_FOUND, HttpStatus.BAD_REQUEST, details);
+  }
+}
+
+export class EmailConfirmationException extends UserHttpException {
+  constructor(details?: Record<string, string | number>) {
+    super(UserErrorCode.EMAIL_CONFIRMATION, HttpStatus.BAD_REQUEST, details);
   }
 }

@@ -54,4 +54,16 @@ export class User extends SoftDeleteEntity {
   @ApiProperty({ description: 'Expiration du token de réinitialisation', nullable: true })
   @Column({ type: 'timestamp', nullable: true })
   resetPasswordTokenExpires?: Date | null;
+
+  @ApiProperty({ description: 'Email confirmé ou non', default: false })
+  @Column({ type: 'boolean', default: false })
+  emailConfirmed: boolean;
+
+  @ApiProperty({ description: 'Token temporaire pour la confirmation email', nullable: true })
+  @Column({ type: 'varchar', nullable: true })
+  emailConfirmationToken?: string | null;
+
+  @ApiProperty({ description: 'Expiration du token de confirmation email', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
+  emailConfirmationTokenExpires?: Date | null;
 }

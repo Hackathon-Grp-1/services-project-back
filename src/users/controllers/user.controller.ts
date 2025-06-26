@@ -12,6 +12,7 @@ import { LoggedUser } from '@src/auth/types/logged-user.type';
 import { Public } from '@src/common/decorators/public.decorator';
 import { SwaggerFailureResponse } from '@src/common/helpers/common-set-decorators.helper';
 import { PaginatedList } from '@src/paginator/paginator.type';
+import { ConfirmEmailDto } from '../dto/user/confirm-email.dto';
 import { CreateUserDto, FormattedCreatedUserDto } from '../dto/user/create-user.dto';
 import { ResetPasswordDto, ResetPasswordRequestDto } from '../dto/user/reset-password.dto';
 import { UpdateUserDto } from '../dto/user/update-user.dto';
@@ -175,5 +176,27 @@ export class UserController {
   async confirmResetPassword(@Body() dto: ResetPasswordDto): Promise<{ message: string }> {
     await this.userService.confirmResetPassword(dto.token, dto.newPassword);
     return { message: 'Password has been reset successfully.' };
+  }
+
+  /**
+   * Confirme l'email de l'utilisateur avec le token fourni.
+   */
+  @Public()
+  @DisableActivityLogger()
+  @Post('confirm-email')
+  async confirmEmail(@Body() dto: ConfirmEmailDto): Promise<{ message: string }> {
+    await this.userService.confirmEmail(dto.token);
+    return { message: 'Email confirmed successfully. Your account is now active.' };
+  }
+
+  /**
+   * Valide le compte utilisateur avec le token fourni.
+   */
+  @Public()
+  @DisableActivityLogger()
+  @Post('validate-account')
+  async validateAccount(@Body() dto: ConfirmEmailDto): Promise<{ message: string }> {
+    await this.userService.confirmEmail(dto.token);
+    return { message: 'Account validated successfully. Your account is now active and you can log in.' };
   }
 }

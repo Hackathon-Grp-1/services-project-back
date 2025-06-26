@@ -1,0 +1,55 @@
+meta {
+  name: Confirm Email
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/v1/users/confirm-email
+  body: json {
+    {
+      "token": "your-email-confirmation-token-here"
+    }
+  }
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+docs {
+  # Email Confirmation
+
+  This endpoint allows users to confirm their email address using the token received via email.
+
+  ## Request Body
+
+  - `token` (string, required): The email confirmation token received via email
+
+  ## Response
+
+  Returns a success message when the email is confirmed successfully.
+
+  ```json
+  {
+    "message": "Email confirmed successfully. Your account is now active."
+  }
+  ```
+
+  ## Email Template
+
+  The user will receive a beautifully formatted welcome email with:
+  - Professional green gradient design
+  - Clear call-to-action button
+  - Welcome message and instructions
+  - 24-hour expiry notice
+  - Step-by-step guide
+
+  ## Workflow
+
+  1. User registers with email and password
+  2. System sends confirmation email with token
+  3. User clicks confirmation link or uses this endpoint
+  4. Account is activated and user can log in
+} 

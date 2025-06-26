@@ -12,6 +12,7 @@ const configuration = () => ({
   api_version: process.env.API_VERSION ?? '1',
   port: parseInt(process.env.PORT ?? '3007', 10),
   app_url: process.env.APP_URL ?? 'http://localhost:3007',
+  front_url: process.env.FRONT_URL ?? 'http://localhost:3008',
 
   sql_logging: ['true', undefined].includes(process.env.POSTGRES_LOGGING),
   default_limit: parseInt(process.env.PAGINATION_DEFAULT_LIMIT ?? '15', 10),
