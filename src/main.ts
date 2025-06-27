@@ -30,7 +30,7 @@ async function bootstrap() {
     }),
   );
   app.enableCors({
-    origin: [configService.get('front_url'), configService.get('n8n')],
+    origin: [configService.get('front_url'), configService.get('n8n'), 'http://localhost:5173'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization', 'X-API-Key'],
     credentials: true,
