@@ -5,7 +5,6 @@ import { ApiConfigService } from '@src/config/services/api-config.service';
 import { CreateUserDto } from '@src/users/dto/user/create-user.dto';
 import { UserDeactivateException, UserEmailAlreadyExistsException } from '@src/users/helpers/exceptions/user.exception';
 import { UserService } from '@src/users/services/user.service';
-import { RoleType } from '@src/users/types/role.types';
 import { randomBytes } from 'crypto';
 import { ContactDto } from '../dtos/contact.dto';
 import { CreateUserRequestDto } from '../dtos/create-user-request.dto';
@@ -90,7 +89,7 @@ export class AuthService {
       password: createUserRequestDto.password,
       phoneNumber: createUserRequestDto.phoneNumber,
       confirmPassword: createUserRequestDto.confirmPassword,
-      role: createUserRequestDto.role as RoleType, // Utilise le rôle transmis par le front
+      role: createUserRequestDto.role, // Utilise le rôle transmis par le front
     };
 
     // Create user with emailConfirmed = false and store the token
