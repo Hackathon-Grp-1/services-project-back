@@ -59,7 +59,7 @@ export class Service extends SoftDeleteEntity {
   localization?: string;
 
   @ApiProperty({ description: 'Description professionnelle courte' })
-  @Column({ name: 'short_professional_description', type: 'varchar', length: 256 })
+  @Column({ name: 'short_professional_description', type: 'text' })
   shortProfessionalDescription: string;
 
   @ApiProperty({ description: 'Description des compétences courte' })
