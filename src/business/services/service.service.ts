@@ -13,7 +13,7 @@ export class ServiceService {
     @InjectRepository(Service)
     private readonly serviceRepository: Repository<Service>,
     private readonly userService: UserService,
-  ) { }
+  ) {}
 
   async create(createServiceDto: CreateServiceDto): Promise<Service> {
     const { user, organization, ...rest } = createServiceDto;
@@ -108,5 +108,9 @@ export class ServiceService {
     return this.serviceRepository.find({
       where: { serviceType: type },
     });
+  }
+
+  async softDeleteById(id: number) {
+    return await this.serviceRepository.softDelete({ id });
   }
 }

@@ -26,7 +26,7 @@ export class Service extends SoftDeleteEntity {
   @Column({ name: 'ai_agent_name', type: 'varchar', length: 128, nullable: true })
   aiAgentName?: string;
 
-  @ApiProperty({ required: false, description: 'Nom de l\'organisation' })
+  @ApiProperty({ required: false, description: "Nom de l'organisation" })
   @Column({ name: 'organization', type: 'varchar', length: 128, nullable: true })
   organization?: string;
 
@@ -50,7 +50,7 @@ export class Service extends SoftDeleteEntity {
   @Column({ name: 'skills', type: 'simple-array' })
   skills: string[];
 
-  @ApiProperty({ description: 'Domaines d\'expertise' })
+  @ApiProperty({ description: "Domaines d'expertise" })
   @Column({ name: 'domains', type: 'simple-array' })
   domains: string[];
 

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { Resources } from '@src/activity-logger/types/resource.types';
 import { GetUser } from '@src/auth/decorators/user.decorator';
@@ -17,7 +17,7 @@ import { ServiceService } from '../services/service.service';
 @UseGuards(RolesGuard)
 @Controller({ path: 'services', version: ['1'] })
 export class ServiceController {
-  constructor(private readonly serviceService: ServiceService) { }
+  constructor(private readonly serviceService: ServiceService) {}
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -101,5 +101,16 @@ export class ServiceController {
   })
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateServiceDto): Promise<Service> {
     return this.serviceService.update(id, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Delete(':id')
+  @ApiResponse({
+    status: 200,
+    description: 'Supprimer un service (soft delete)',
+  })
+  async softDelete(@Param('id', ParseIntPipe) id: number) {
+    return this.serviceService.softDeleteById(id);
   }
 }
