@@ -22,7 +22,7 @@ import { AuthService } from './../services/auth.service';
 @SwaggerFailureResponse()
 @Controller({ path: 'auth', version: ['1'] })
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   /**
    * Sign in to the application.
@@ -54,7 +54,11 @@ export class AuthController {
   @Post('register')
   @SwaggerAuthCreateUserRequest()
   @DisableActivityLogger()
+<<<<<<< Updated upstream
   async createUserRequest(@Body() createUserRequestDto: CreateUserRequestDto): Promise<{ message: string }> {
+=======
+  async createUserRequest(@Body() createUserRequestDto: CreateUserRequestDto): Promise<FormattedCreatedUserDto> {
+>>>>>>> Stashed changes
     return await this.authService.createUserRequest(createUserRequestDto);
   }
 

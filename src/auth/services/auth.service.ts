@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { MailerService } from '@src/common/services/mailer.service';
 import { ApiConfigService } from '@src/config/services/api-config.service';
@@ -20,12 +20,18 @@ import { LoggedUser, LoggedUserWithToken } from '../types/logged-user.type';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+<<<<<<< Updated upstream
     private readonly mailerService: MailerService,
     private readonly configService: ApiConfigService,
   ) {}
+=======
+  ) { }
+>>>>>>> Stashed changes
 
   async singInPassword(email: string, password: string): Promise<LoggedUserWithToken> {
     const user = await this.userService.findOneByEmailWithPassword(email);
@@ -68,6 +74,7 @@ export class AuthService {
    * @param createUserRequestDto The registration request data
    * @returns Success message
    */
+<<<<<<< Updated upstream
   async createUserRequest(createUserRequestDto: CreateUserRequestDto): Promise<{ message: string }> {
     // Check if email already exists
     const isUserExists = await this.userService.emailAlreadyExists(createUserRequestDto.email);
@@ -81,6 +88,13 @@ export class AuthService {
 
     // Store token temporarily (you might want to use Redis or a temporary table in production)
     // For now, we'll create a temporary user record that will be activated upon confirmation
+=======
+  async createUserRequest(createUserRequestDto: CreateUserRequestDto): Promise<FormattedCreatedUserDto> {
+    this.logger.log('Payload reçu pour création:', JSON.stringify(createUserRequestDto));
+    this.logger.log('Rôle transmis:', createUserRequestDto.role);
+
+    // Create user
+>>>>>>> Stashed changes
     const createUserDto: CreateUserDto = {
       firstName: createUserRequestDto.firstName,
       lastName: createUserRequestDto.lastName,
@@ -88,9 +102,10 @@ export class AuthService {
       password: createUserRequestDto.password,
       phoneNumber: createUserRequestDto.phoneNumber,
       confirmPassword: createUserRequestDto.confirmPassword,
-      role: RoleType.CUSTOMER,
+      role: createUserRequestDto.role as RoleType, // Utilise le rôle transmis par le front
     };
 
+<<<<<<< Updated upstream
     // Create user with emailConfirmed = false and store the token
     const user = await this.userService.createWithToken(createUserDto, token, tokenExpires);
 
@@ -572,5 +587,9 @@ Veuillez répondre directement à l'adresse email de l'expéditeur ci-dessus.
     });
 
     return { message: 'Contact message sent successfully' };
+=======
+    this.logger.log('DTO créé pour UserService:', JSON.stringify(createUserDto));
+    return await this.userService.create(createUserDto);
+>>>>>>> Stashed changes
   }
 }

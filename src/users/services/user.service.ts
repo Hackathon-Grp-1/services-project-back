@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityFilteredListResults, getEntityFilteredList } from '@paginator/paginator.service';
 import { Password } from '@src/auth/helpers/password.utils';
@@ -20,6 +20,8 @@ import { UserType } from '../types/user.types';
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
+
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -27,7 +29,7 @@ export class UserService {
     private readonly roleRepository: Repository<Role>,
     private readonly mailerService: MailerService,
     private readonly configService: ApiConfigService,
-  ) {}
+  ) { }
 
   /**
    * Creates a new user with a validation token.
@@ -68,11 +70,15 @@ export class UserService {
    * @throws {RoleNotFoundException} If the specified role does not exist.
    */
   async create(createUserDto: CreateUserDto): Promise<FormattedCreatedUserDto> {
+    this.logger.log('UserService - DTO reçu:', JSON.stringify(createUserDto));
+    this.logger.log('UserService - Rôle demandé:', createUserDto.role);
+
     const isUserExists = await this.emailAlreadyExists(createUserDto.email);
     if (isUserExists) throw new UserEmailAlreadyExistsException({ email: createUserDto.email });
 
     // Get role
     const role = await this.roleRepository.findOneBy({ type: createUserDto.role });
+    this.logger.log('UserService - Role trouvé:', JSON.stringify(role));
     if (!role) throw new RoleNotFoundException({ type: createUserDto.role });
 
     // Hash password
@@ -89,7 +95,9 @@ export class UserService {
       emailConfirmed: false, // Email not confirmed by default
     });
 
+    this.logger.log('UserService - Utilisateur à créer:', JSON.stringify(creatingUser));
     const createdUser = await this.userRepository.save(creatingUser);
+    this.logger.log('UserService - Utilisateur créé:', JSON.stringify(createdUser));
 
     // Send email confirmation
     await this.sendEmailConfirmation(createdUser);

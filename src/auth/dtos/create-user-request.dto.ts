@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Match } from '@src/common/decorators/match-fields.decorator';
+import { RoleType } from '@src/users/types/role.types';
 import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsOptional, IsString, Matches, MinLength } from 'class-validator';
 
@@ -72,4 +73,9 @@ export class CreateUserRequestDto {
   @IsNotEmpty()
   @Match('password', { message: 'Passwords do not match' })
   confirmPassword: string;
+
+  @ApiProperty({ enum: RoleType, example: RoleType.ENTREPRENEUR })
+  @IsNotEmpty()
+  @IsString()
+  role: RoleType;
 }
