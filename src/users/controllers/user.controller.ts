@@ -160,7 +160,6 @@ export class UserController {
    * @returns {Promise<{ message: string }>} Un message de confirmation.
    */
   @Public()
-  @DisableActivityLogger()
   @Post('reset-password')
   async requestPasswordReset(@Body() dto: ResetPasswordRequestDto): Promise<{ message: string }> {
     await this.userService.requestPasswordReset(dto.email);
@@ -171,7 +170,6 @@ export class UserController {
    * Confirme la réinitialisation du mot de passe avec le token et le nouveau mot de passe.
    */
   @Public()
-  @DisableActivityLogger()
   @Post('reset-password/confirm')
   async confirmResetPassword(@Body() dto: ResetPasswordDto): Promise<{ message: string }> {
     await this.userService.confirmResetPassword(dto.token, dto.newPassword);
