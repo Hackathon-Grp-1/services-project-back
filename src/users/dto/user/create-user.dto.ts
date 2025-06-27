@@ -41,7 +41,11 @@ export class CreateUserDto {
   @Match('password')
   confirmPassword: string;
 
-  @ApiProperty({ description: 'Role of the user', enum: [RoleType.ENTREPRENEUR, RoleType.CUSTOMER], example: RoleType.ENTREPRENEUR })
+  @ApiProperty({
+    description: 'Role of the user',
+    enum: [RoleType.ENTREPRENEUR, RoleType.CUSTOMER],
+    example: RoleType.ENTREPRENEUR,
+  })
   @IsEnum(RoleType, { message: 'Role must be ENTREPRENEUR ou CUSTOMER' })
   @IsNotEmpty()
   role: RoleType;

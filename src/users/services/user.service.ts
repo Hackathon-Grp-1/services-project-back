@@ -29,7 +29,7 @@ export class UserService {
     private readonly roleRepository: Repository<Role>,
     private readonly mailerService: MailerService,
     private readonly configService: ApiConfigService,
-  ) { }
+  ) {}
 
   /**
    * Creates a new user with a validation token.

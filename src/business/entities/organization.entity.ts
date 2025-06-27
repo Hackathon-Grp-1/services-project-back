@@ -5,12 +5,12 @@ import { OrganizationEconomicSizeKind } from '../types/organization.types';
 
 @Entity('organizations')
 export class Organization extends SoftDeleteEntity {
-  @ApiProperty({ description: 'Auteur de l\'organisation' })
+  @ApiProperty({ description: "Auteur de l'organisation" })
   @ManyToOne('User', { nullable: false })
   @JoinColumn({ name: 'author_id' })
   author: any;
 
-  @ApiProperty({ description: 'Propriétaire de l\'organisation', required: false })
+  @ApiProperty({ description: "Propriétaire de l'organisation", required: false })
   @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'owner_id' })
   owner?: any;

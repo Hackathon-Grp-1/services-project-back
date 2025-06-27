@@ -42,7 +42,7 @@ export class UpdateServiceDto {
   @IsString()
   aiAgentName?: string;
 
-  @ApiProperty({ required: false, description: 'Nom de l\'organisation' })
+  @ApiProperty({ required: false, description: "Nom de l'organisation" })
   @IsOptional()
   @IsString()
   organization?: string;

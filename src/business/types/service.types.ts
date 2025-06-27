@@ -54,4 +54,4 @@ export interface ServiceResponse {
   userId: number;
   createdAt: Date;
   updatedAt: Date;
-} 
+}

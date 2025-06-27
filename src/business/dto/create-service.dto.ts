@@ -38,7 +38,7 @@ export class CreateServiceDto {
   @IsString()
   aiAgentName?: string;
 
-  @ApiProperty({ required: false, description: 'Nom de l\'organisation' })
+  @ApiProperty({ required: false, description: "Nom de l'organisation" })
   @IsOptional()
   @IsString()
   organization?: string;
@@ -66,7 +66,7 @@ export class CreateServiceDto {
   @IsString({ each: true })
   skills: string[];
 
-  @ApiProperty({ type: [String], description: 'Domaines d\'expertise' })
+  @ApiProperty({ type: [String], description: "Domaines d'expertise" })
   @IsArray()
   @ArrayNotEmpty()
   @IsString({ each: true })
