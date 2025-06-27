@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ActivityLoggerModule } from './activity-logger/activity-logger.module';
 import { LoggingInterceptor } from './activity-logger/helpers/activity-logger.interceptor';
 import { AuthModule } from './auth/auth.module';
+import { AutomatedServicesModule } from './automated-services/automated-services.module';
 import { BusinessModule } from './business/business.module';
 import { MailerService } from './common/services/mailer.service';
 import { ApiConfigModule } from './config/api-config.module';
@@ -35,6 +36,7 @@ const configService = new ApiConfigService(nestConfigService);
     ActivityLoggerModule,
     AuthModule,
     BusinessModule,
+    AutomatedServicesModule,
   ],
   providers: [
     {

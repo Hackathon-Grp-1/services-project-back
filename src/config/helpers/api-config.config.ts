@@ -47,6 +47,8 @@ const configuration = () => ({
     ttl: parseInt(process.env.THROTTLER_TTL ?? '3600000', 10),
     limit: parseInt(process.env.THROTTLER_LIMIT ?? '10', 10),
   },
+
+  n8n: process.env.N8N_URL ?? '',
 });
 
 export default configuration;
